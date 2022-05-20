@@ -1,6 +1,8 @@
 #ifndef __SOKOBAN_HPP__
 #define __SOKOBAN_HPP__
 
+#include "Formula.hpp"
+
 #include <vector>
 #include <string>
 
@@ -11,11 +13,11 @@ class State {
 			: player_coordinates(_player_coordinates), boxes_coordinates(_boxes_coordinates) { 		}
 		
 		std::vector<bool> GetPlayerCoordinates() const; 
-		std::vector<bool> GetBoxesCoordinates() const;
+		std::vector<bool> GetBoxesCoordinates() const; 
 		
 	private:
-		std::vector<bool> player_coordinates;
-		std::vector<bool> boxes_coordinates;
+		std::vector<bool> player_coordinates; 
+		std::vector<bool> boxes_coordinates; 
 };
 
 
@@ -37,6 +39,19 @@ class Table {
 };
 
 
+class Move {
+	public:
+		Move(short _type, Table *_table, State *_state) : type(_type), table(_table), state(_state) {	}
+		~Move();
+		std::string GetType() const;
+		Formula MoveFormula() const;
+	private:
+		short type;
+		Table *table;
+		State *state;
+};
+
+
 class Sokoban {
 	public:
 		Sokoban(int _plan_length, std::vector<std::string> table);
@@ -44,11 +59,10 @@ class Sokoban {
 		
 		void PrintTable() const;
 		
-		
 	private:
 		int plan_length;
 		Table *table;
-		State *state;
+		State *current_state;
 };
 
 

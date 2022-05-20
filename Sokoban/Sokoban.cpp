@@ -1,40 +1,35 @@
 #include "Sokoban.hpp"
+#include "Formula.hpp"
 
 #include <iostream>
 #include <string>
 #include <vector>
 
+std::vector<bool> State::GetPlayerCoordinates() const { return player_coordinates; }
+std::vector<bool> State::GetBoxesCoordinates() const { return boxes_coordinates; }
 
+std::vector<bool> Table::GetWalls() const { return walls; }
+std::vector<bool> Table::GetBoxHome() const { return box_home;}
+int Table::GetN() const { return n; }
+int Table::GetM() const { return m; }
 
-std::vector<bool> State::GetPlayerCoordinates() const {
-	return player_coordinates;
+std::string Move::GetType() const {
+	switch(type) {
+		case(0): return "up";
+		case(1): return "down";
+		case(2): return "left";
+		case(3): return "right";
+	}
 }
 
-std::vector<bool> State::GetBoxesCoordinates() const {
-	return boxes_coordinates;
-}
-
-
-std::vector<bool> Table::GetWalls() const {
-	return walls;
-}
-
-std::vector<bool> Table::GetBoxHome() const {
-	return box_home;
-}
-
-int Table::GetN() const {
-	return n;
-}
-
-int Table::GetM() const {
-	return m;
+Move::~Move() {
+	delete table;
+	delete state;
 }
 
 
 Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 	plan_length = _plan_length;
-	
 	
 	int i, j;
 	int n = table_str.size();
@@ -45,7 +40,6 @@ Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 	
 	std::vector<bool> walls(n*m, false);
 	std::vector<bool> box_home(n*m, false);
-	
 	
 	for(i=0; i<n; i++) {
 		for(j=0; j<m; j++) {
@@ -75,14 +69,13 @@ Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 			}
 		}
 	}
-	
 	table = new Table(n, m, walls, box_home);
-	state = new State(player_coordinates, boxes_coordinates);
+	current_state = new State(player_coordinates, boxes_coordinates);
 }
 
 Sokoban::~Sokoban() {
 	delete table;
-	delete state;
+	delete current_state;
 }
 
 void Sokoban::PrintTable() const {
@@ -119,13 +112,11 @@ void Sokoban::PrintTable() const {
 				std::cout << "b";
 				continue;
 			}
-			
 			std::cout << " ";
-			
 		}
 		std::cout << std::endl;
 	}
-	
 	std::cout << std::endl;
-	
 }
+
+
