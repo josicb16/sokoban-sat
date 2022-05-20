@@ -1,3 +1,4 @@
+
 #include "Formula.hpp"
 
 #include <iostream>
@@ -74,13 +75,5 @@ Impl::~Impl() {
 Eql::~Eql() {
 	delete l;
 	delete r;
-}
-
-int main() {
-	Not f(new And(new Atom(1), new Or(new Atom(1), new Atom(3))));
-	
-	f.printFormula();
-	
-	return 0;
 }
 
