@@ -9,13 +9,14 @@
 class BaseFormula;
 using Formula = std::shared_ptr<BaseFormula>;
 
-class BaseFormula : public std::enable_shared_from_this<BaseFormula>{
+class BaseFormula {
 	public:
 		virtual ~BaseFormula()     {	}
 		virtual void PrintFormula() const = 0;
 		virtual std::string GetType() const = 0;
 		virtual Formula ToNNF() const= 0;
 		virtual int ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const = 0;
+		std::string Dimacs() const;
 		virtual Formula GetFormulaData() const {	}
 		virtual Formula GetFormulaDataL() const {	}
 		virtual Formula GetFormulaDataR() const {	}

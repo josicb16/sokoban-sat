@@ -253,3 +253,47 @@ int Eql::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 }
 
 
+std::string BaseFormula::Dimacs() const {
+	Formula f = this->ToNNF();
+	
+	std::set<int> atoms;
+	f->GetAtoms(atoms);
+	int atom = *atoms.rbegin() + 1;
+	
+	std::vector<std::vector<int>> cnf;
+	int s = f->ToTseitinCNF(cnf, atom);
+	cnf.push_back({s});
+	
+	if(cnf.empty())
+		return "p cnf 0 0";
+	
+	int number_of_clauses = cnf.size();
+	
+	std::set<unsigned> variables;
+	int i;
+	for(i=0; i<number_of_clauses; i++) {
+		auto it = cnf[i].cbegin();
+		auto it_end = cnf[i].cend();
+		while(it != it_end) {
+			variables.insert(abs(*it));
+			it++;
+		}
+	}
+	
+	int number_of_variables = variables.size();
+	
+	std::string rez = "p cnf " + std::to_string(number_of_variables) + " " + std::to_string(number_of_clauses) + "\n";
+	
+	for(i=0; i<number_of_clauses; i++) {
+		auto it = cnf[i].cbegin();
+		auto it_end = cnf[i].cend();
+		while(it != it_end) {
+			rez += std::to_string(*it) + " ";
+			it++;
+		}
+		rez += "0\n";
+	}
+	
+	return rez;
+}
+
