@@ -10,31 +10,46 @@ std::vector<bool> State::GetPlayerCoordinates() const {
 	return player_coordinates;
 }
 
-
 std::vector<bool> State::GetBoxesCoordinates() const {
 	return boxes_coordinates;
 }
 
 
-Sokoban::Sokoban(int _plan_length, std::vector<std::string> table) {
+std::vector<bool> Table::GetWalls() const {
+	return walls;
+}
+
+std::vector<bool> Table::GetBoxHome() const {
+	return box_home;
+}
+
+int Table::GetN() const {
+	return n;
+}
+
+int Table::GetM() const {
+	return m;
+}
+
+
+Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 	plan_length = _plan_length;
 	
+	
 	int i, j;
-	n = table.size();
-	m = table[0].length();
+	int n = table_str.size();
+	int m = table_str[0].length();
 	
 	std::vector<bool> player_coordinates(n*m, false);
 	std::vector<bool> boxes_coordinates(n*m, false);
 	
-	std::vector<bool> tmp1(n*m, false);
-	walls = tmp1;
+	std::vector<bool> walls(n*m, false);
+	std::vector<bool> box_home(n*m, false);
 	
-	std::vector<bool> tmp2(n*m, false);
-	box_home = tmp2;
 	
 	for(i=0; i<n; i++) {
 		for(j=0; j<m; j++) {
-			switch(table[i][j]) {
+			switch(table_str[i][j]) {
 				case '#':  // wall
 					walls[j*n+i] = true;
 					break;
@@ -55,26 +70,30 @@ Sokoban::Sokoban(int _plan_length, std::vector<std::string> table) {
 					boxes_coordinates[j*n+i] = true;
 					box_home[j*n+i] = true;
 					break;
-				default: // prazan prostor
+				default: // empty space
 					continue;
 			}
 		}
 	}
 	
+	table = new Table(n, m, walls, box_home);
 	state = new State(player_coordinates, boxes_coordinates);
-	
 }
 
-
 Sokoban::~Sokoban() {
+	delete table;
 	delete state;
 }
 
-
 void Sokoban::PrintTable() const {
+	std::vector<bool> walls = table->GetWalls();
+	std::vector<bool> box_home = table->GetBoxHome();
 	
 	std::vector<bool> player_coordinates = state->GetPlayerCoordinates();
 	std::vector<bool> boxes_coordinates = state->GetBoxesCoordinates();
+	
+	int n = table->GetN();
+	int m = table->GetM();
 	
 	int i, j;
 	for(i=0; i<n; i++) {
