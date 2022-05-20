@@ -4,7 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <set>
 #include <cstdlib>
+#include <algorithm>
 
 std::string True::GetType() const { return "true"; }
 std::string False::GetType() const { return "false"; }
@@ -27,6 +29,35 @@ Formula Or::GetFormulaDataR() const { return r; }
 Formula Impl::GetFormulaDataR() const { return r; }
 Formula Eql::GetFormulaDataR() const { return r; }
 
+
+void Atom::GetAtoms(std::set<int>& atoms) const {
+	atoms.insert(n);
+	return;
+}
+void Not::GetAtoms(std::set<int>& atoms) const {
+	f->GetAtoms(atoms);
+	return;
+}
+void And::GetAtoms(std::set<int>& atoms) const {
+	l->GetAtoms(atoms);
+	r->GetAtoms(atoms);
+	return;
+}
+void Or::GetAtoms(std::set<int>& atoms) const {
+	l->GetAtoms(atoms);
+	r->GetAtoms(atoms);
+	return;
+}
+void Impl::GetAtoms(std::set<int>& atoms) const {
+	l->GetAtoms(atoms);
+	r->GetAtoms(atoms);
+	return;
+}
+void Eql::GetAtoms(std::set<int>& atoms) const {
+	l->GetAtoms(atoms);
+	r->GetAtoms(atoms);
+	return;
+}
 
 
 void True::PrintFormula() const {
@@ -79,7 +110,6 @@ void Eql::PrintFormula() const {
 	r->PrintFormula();
 	std::cout << ")";
 }
-
 
 
 Formula True::ToNNF() const {
@@ -157,6 +187,69 @@ Formula Eql::ToNNF() const {
 	Formula r1 = std::make_shared<Impl>(r, l);
 	Formula tmp = std::make_shared<And>(l1, r1);
 	return tmp->ToNNF();
+}
+
+
+
+int True::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+	cnf.push_back({atom});
+	return atom+1;
+}
+
+int False::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+	cnf.push_back({-atom});
+	return atom+1;
+}
+
+int Atom::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+	return n;
+}
+
+int Not::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+	int subformula = f->ToTseitinCNF(cnf, atom);
+	std::vector<std::vector<int>> tseitin_not = {{-subformula, -atom}, {subformula, atom}};
+	std::copy(begin(tseitin_not), end(tseitin_not), std::back_inserter(cnf));
+	return atom+1;
+}
+
+int And::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+	int l_atom = l->ToTseitinCNF(cnf, atom);
+	int r_atom = r->ToTseitinCNF(cnf, atom);
+	
+	std::vector<std::vector<int>> tseitin_and = {{-atom, l_atom}, {-atom, r_atom}, {atom, -l_atom, -r_atom}};
+	
+	std::copy(begin(tseitin_and), end(tseitin_and), std::back_inserter(cnf));
+	return atom+1;
+}
+
+int Or::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+    int l_atom = l->ToTseitinCNF(cnf, atom);
+	int r_atom = r->ToTseitinCNF(cnf, atom);
+	
+	std::vector<std::vector<int>> tseitin_or = {{-atom, l_atom, r_atom}, {atom, -l_atom}, {atom, -r_atom}};
+	
+	std::copy(begin(tseitin_or), end(tseitin_or), std::back_inserter(cnf));
+	return atom+1;
+}
+
+int Impl::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+	int l_atom = l->ToTseitinCNF(cnf, atom);
+	int r_atom = r->ToTseitinCNF(cnf, atom);
+	
+	std::vector<std::vector<int>> tseitin_impl = {{-atom, -l_atom, r_atom}, {atom, l_atom}, {atom, -r_atom}};
+	
+	std::copy(begin(tseitin_impl), end(tseitin_impl), std::back_inserter(cnf));
+	return atom+1;
+}
+
+int Eql::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
+	int l_atom = l->ToTseitinCNF(cnf, atom);
+	int r_atom = r->ToTseitinCNF(cnf, atom);
+	
+	std::vector<std::vector<int>> tseitin_eql = {{-atom, -l_atom, r_atom}, {-atom, l_atom, -r_atom}, {atom, l_atom, r_atom}, {atom, -l_atom, -r_atom}};
+	
+	std::copy(begin(tseitin_eql), end(tseitin_eql), std::back_inserter(cnf));
+	return atom+1;
 }
 
 
