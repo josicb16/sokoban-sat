@@ -16,8 +16,8 @@ class State {
 		std::vector<bool> GetBoxesCoordinates() const; 
 		
 	private:
-		std::vector<bool> player_coordinates; 
-		std::vector<bool> boxes_coordinates; 
+		std::vector<bool> player_coordinates; // [1, n*m]
+		std::vector<bool> boxes_coordinates; //  [1+n*m, 2*n*m]
 };
 
 
@@ -44,7 +44,8 @@ class Move {
 		Move(short _type, Table *_table, State *_state) : type(_type), table(_table), state(_state) {	}
 		~Move();
 		std::string GetType() const;
-		Formula MoveFormula() const;
+		Formula MovePrecondition() const;
+		Formula MoveEffect() const;
 	private:
 		short type;
 		Table *table;
@@ -56,7 +57,8 @@ class Sokoban {
 	public:
 		Sokoban(int _plan_length, std::vector<std::string> table);
 		~Sokoban();
-		
+		Table *GetTable() const;
+		State *GetState() const;
 		void PrintTable() const;
 		
 	private:

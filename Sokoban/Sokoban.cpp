@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 
 std::vector<bool> State::GetPlayerCoordinates() const { return player_coordinates; }
 std::vector<bool> State::GetBoxesCoordinates() const { return boxes_coordinates; }
@@ -22,9 +23,134 @@ std::string Move::GetType() const {
 	}
 }
 
+
+
+Formula Move::MovePrecondition() const {
+	int n = table->GetN();
+	int m = table->GetM();
+	int i;
+	
+	std::vector<bool> S = state->GetPlayerCoordinates(); // [1, n*m] 
+	std::vector<bool> B = state->GetBoxesCoordinates(); //  [1+n*m, 2*n*m]
+	std::vector<bool> W = table->GetWalls();
+	
+	if(type==0) {   // up
+	/*
+	(Sokoban nije u prvom redu i iznad njega nisu ni zid ni kutija ) ili
+	(Sokoban nije u prvom ni drugom redu i iznad njega nije zid i dva reda iznad njega nisu 
+	ni zid ni kutija)
+	*/
+		Formula tmp_atom;
+		Formula tmp_box;
+		Formula tmp_not;
+		Formula tmp_and;
+		Formula tmp_or;
+		std::vector<Formula> tmp_vector;
+		
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=0; i<m; i++) {
+			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+
+		int vector_size = tmp_vector.size();
+		for(i=m; i<n*m; i++) {
+			if(!W[i-m]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i+1-m+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		} 
+		
+		Formula first_condition = std::make_shared<And>(tmp_vector[m], tmp_vector[vector_size-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=0; i<2*m; i++) {
+			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int first_size = tmp_vector.size();
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+		
+		vector_size = tmp_vector.size();
+		for(i=2*m; i<n*m; i++) {
+			if(!W[i-2*m]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i+1-2*m+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+		
+		int second = vector_size;
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first);
+		vector_size++;
+		
+		for(i=m; i<n*m; i++) {
+			if(!W[i-m]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+
+		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
+		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
+		
+		return std::make_shared<Or>(first_condition, second_condition);
+		
+	}
+	/*
+	if(type==1) { // down
+		
+	}
+	if(type==2) { // left
+		
+	}
+	if(type==3) { // right
+		
+	}
+	*/
+	
+}
+
+
 Move::~Move() {
 	delete table;
 	delete state;
+}
+
+
+Table *Sokoban::GetTable() const {
+	return table;
+}
+		
+State *Sokoban::GetState() const {
+	return current_state;
 }
 
 
@@ -45,24 +171,24 @@ Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 		for(j=0; j<m; j++) {
 			switch(table_str[i][j]) {
 				case '#':  // wall
-					walls[j*n+i] = true;
+					walls[j*m+i] = true;
 					break;
 				case 'o':  // box_home
-					box_home[j*n+i] = true;
+					box_home[j*m+i] = true;
 					break;
 				case 's':  // Sokoban
-					player_coordinates[j*n+i] = true;
+					player_coordinates[j*m+i] = true;
 					break;
 				case 'S':  // Sokoban; box_home
-					player_coordinates[j*n+i] = true;
-					box_home[j*n+i] = true;
+					player_coordinates[j*m+i] = true;
+					box_home[j*m+i] = true;
 					break;
 				case 'b':  // box
-					boxes_coordinates[j*n+i] = true;
+					boxes_coordinates[j*m+i] = true;
 					break;
 				case 'B':  // box; box_home
-					boxes_coordinates[j*n+i] = true;
-					box_home[j*n+i] = true;
+					boxes_coordinates[j*m+i] = true;
+					box_home[j*m+i] = true;
 					break;
 				default: // empty space
 					continue;
@@ -82,8 +208,8 @@ void Sokoban::PrintTable() const {
 	std::vector<bool> walls = table->GetWalls();
 	std::vector<bool> box_home = table->GetBoxHome();
 	
-	std::vector<bool> player_coordinates = state->GetPlayerCoordinates();
-	std::vector<bool> boxes_coordinates = state->GetBoxesCoordinates();
+	std::vector<bool> player_coordinates = current_state->GetPlayerCoordinates();
+	std::vector<bool> boxes_coordinates = current_state->GetBoxesCoordinates();
 	
 	int n = table->GetN();
 	int m = table->GetM();
@@ -91,24 +217,24 @@ void Sokoban::PrintTable() const {
 	int i, j;
 	for(i=0; i<n; i++) {
 		for(j=0; j<m; j++) {
-			if(walls[j*n+i]) {
+			if(walls[j*m+i]) {
 				std::cout << "#";
 				continue;
 			}
-			else if(box_home[j*n+i]) {
-				if(boxes_coordinates[j*n+i]) 
+			else if(box_home[j*m+i]) {
+				if(boxes_coordinates[j*m+i]) 
 					std::cout << "B";
-				else if(player_coordinates[j*n+i])
+				else if(player_coordinates[j*m+i])
 					std::cout << "S";
 				else
 					std::cout << "o";
 				continue;
 			}
-			else if(player_coordinates[j*n+i]) {
+			else if(player_coordinates[j*m+i]) {
 				std::cout << "s";
 				continue;
 			}
-			else if(boxes_coordinates[j*n+i]) {
+			else if(boxes_coordinates[j*m+i]) {
 				std::cout << "b";
 				continue;
 			}
@@ -118,5 +244,6 @@ void Sokoban::PrintTable() const {
 	}
 	std::cout << std::endl;
 }
+
 
 
