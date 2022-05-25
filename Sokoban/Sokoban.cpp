@@ -124,10 +124,97 @@ Formula Move::MovePrecondition() const {
 		return std::make_shared<Or>(first_condition, second_condition);
 		
 	}
-	/*
+	
 	if(type==1) { // down
+	/*
+	(Sokoban nije u poslednjem redu i ispod njega nisu ni zid ni kutija ) ili
+	(Sokoban nije u poslednjem ni pretposlednjem redu i ispod njega nije zid i dva reda 
+	ispod njega nisu ni zid ni kutija)
+	*/
+		Formula tmp_atom;
+		Formula tmp_box;
+		Formula tmp_not;
+		Formula tmp_and;
+		Formula tmp_or;
+		std::vector<Formula> tmp_vector;
 		
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=n*m-m; i<n*m; i++) {
+			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+
+		int vector_size = tmp_vector.size();
+		for(i=0; i<n*m-m; i++) {
+			if(!W[i+m]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i+1+m+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		} 
+		
+		Formula first_condition = std::make_shared<And>(tmp_vector[m], tmp_vector[vector_size-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=n*m-2*m; i<n*m; i++) {
+			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int first_size = tmp_vector.size();
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+		
+		vector_size = tmp_vector.size();
+		for(i=0; i<n*m-2*m; i++) {
+			if(!W[i+2*m]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i+1+2*m+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+		
+		int second = vector_size;
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first);
+		vector_size++;
+		
+		for(i=0; i<n*m-m; i++) {
+			if(!W[i+m]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+
+		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
+		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
+		
+		return std::make_shared<Or>(first_condition, second_condition);
 	}
+	/*
 	if(type==2) { // left
 		
 	}
@@ -246,4 +333,36 @@ void Sokoban::PrintTable() const {
 }
 
 
+
+int main() {
+
+	std::vector<std::string> tmp;
+	tmp.push_back("   #####");
+	tmp.push_back("###   # ");
+	tmp.push_back("#osb  # ");
+	tmp.push_back("### bo# ");
+	tmp.push_back("#o##b # ");
+	tmp.push_back("# # o ##");
+	tmp.push_back("#b Bbbo#");
+	tmp.push_back("#   o  #");
+	tmp.push_back("########");
+
+
+	int plan_length;
+	std::cout << "Upisati duzinu plana: ";
+	std::cin >> plan_length;
+
+
+	Sokoban s(plan_length, tmp);
+
+	s.PrintTable();
+	
+	Move m(0, s.GetTable(), s.GetState());
+	
+	Formula f = m.MovePrecondition();
+	f->PrintFormula();
+	
+
+	return 0;
+}
 
