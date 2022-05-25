@@ -35,11 +35,6 @@ Formula Move::MovePrecondition() const {
 	std::vector<bool> W = table->GetWalls();
 	
 	if(type==0) {   // up
-	/*
-	(Sokoban nije u prvom redu i iznad njega nisu ni zid ni kutija ) ili
-	(Sokoban nije u prvom ni drugom redu i iznad njega nije zid i dva reda iznad njega nisu 
-	ni zid ni kutija)
-	*/
 		Formula tmp_atom;
 		Formula tmp_box;
 		Formula tmp_not;
@@ -126,11 +121,6 @@ Formula Move::MovePrecondition() const {
 	}
 	
 	if(type==1) { // down
-	/*
-	(Sokoban nije u poslednjem redu i ispod njega nisu ni zid ni kutija ) ili
-	(Sokoban nije u poslednjem ni pretposlednjem redu i ispod njega nije zid i dva reda 
-	ispod njega nisu ni zid ni kutija)
-	*/
 		Formula tmp_atom;
 		Formula tmp_box;
 		Formula tmp_not;
@@ -214,14 +204,196 @@ Formula Move::MovePrecondition() const {
 		
 		return std::make_shared<Or>(first_condition, second_condition);
 	}
-	/*
+	
 	if(type==2) { // left
+	Formula tmp_atom;
+		Formula tmp_box;
+		Formula tmp_not;
+		Formula tmp_and;
+		Formula tmp_or;
+		std::vector<Formula> tmp_vector;
 		
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=0; i<n; i++) {
+			tmp_atom = std::make_shared<Atom>(i*m+1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+
+		int vector_size = tmp_vector.size();
+		for(i=0; i<n*m; i++) {
+			if(i%m==0)
+				continue;
+			if(!W[i-1]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		} 
+		
+		Formula first_condition = std::make_shared<And>(tmp_vector[n], tmp_vector[vector_size-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=0; i<n; i++) { 
+			tmp_atom = std::make_shared<Atom>(i*m+1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+			tmp_atom = std::make_shared<Atom>(i*m+2);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int first_size = tmp_vector.size();
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+		
+		vector_size = tmp_vector.size();
+		for(i=0; i<n*m; i++) {   
+			if(i%m==0 || i%m==1)
+				continue;
+			if(!W[i-2]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i-1+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+		
+		int second = vector_size;
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first);
+		vector_size++;
+		
+		for(i=0; i<n*m; i++) {
+			if(i%m==0)
+				continue;
+			if(!W[i-1]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+
+		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
+		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
+		
+		return std::make_shared<Or>(first_condition, second_condition);
+	
 	}
 	if(type==3) { // right
+	Formula tmp_atom;
+		Formula tmp_box;
+		Formula tmp_not;
+		Formula tmp_and;
+		Formula tmp_or;
+		std::vector<Formula> tmp_vector;
 		
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=1; i<=n; i++) {
+			tmp_atom = std::make_shared<Atom>(i*m);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+
+		int vector_size = tmp_vector.size();
+		for(i=0; i<n*m; i++) { 
+			if((i+1)%m==0)
+				continue;
+			if(!W[i+1]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i+2+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		} 
+		
+		Formula first_condition = std::make_shared<And>(tmp_vector[n], tmp_vector[vector_size-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		for(i=1; i<=n; i++) {
+			tmp_atom = std::make_shared<Atom>(i*m);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+			tmp_atom = std::make_shared<Atom>(i*m-1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int first_size = tmp_vector.size();
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first); 
+		
+		vector_size = tmp_vector.size();
+		for(i=0; i<n*m; i++) { 
+			if((i+1)%m==0 || (i+2)%m==0)
+				continue;
+			if(!W[i+2]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_box = std::make_shared<Atom>(i+3+n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+		
+		int second = vector_size;
+		
+		first = std::make_shared<False>();
+		tmp_vector.push_back(first);
+		vector_size++;
+		
+		for(i=0; i<n*m; i++) {
+			if((i+1)%m==0)
+				continue;
+			if(!W[i+1]) {
+				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
+				vector_size++;
+				tmp_vector.push_back(tmp_or);
+			}
+		}
+
+		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
+		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
+		
+		return std::make_shared<Or>(first_condition, second_condition);
 	}
-	*/
 	
 }
 
