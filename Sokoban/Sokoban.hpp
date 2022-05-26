@@ -41,11 +41,11 @@ class Table {
 
 class Move {
 	public:
-		Move(short _type, Table *_table, State *_state) : type(_type), table(_table), state(_state) {	}
+		Move(short _type, Table *_table, State *_state) : type(_type), table(_table), state(_state)  {	}  
 		~Move();
 		std::string GetType() const;
-		Formula MovePrecondition() const;
-		Formula MoveEffect() const;
+		Formula MovePrecondition(int k) const;
+		Formula MoveEffect(int k) const;
 	private:
 		short type;
 		Table *table;

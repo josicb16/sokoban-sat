@@ -25,7 +25,7 @@ std::string Move::GetType() const {
 
 
 
-Formula Move::MovePrecondition() const {
+Formula Move::MovePrecondition(int k) const {
 	int n = table->GetN();
 	int m = table->GetM();
 	int i;
@@ -33,6 +33,7 @@ Formula Move::MovePrecondition() const {
 	std::vector<bool> S = state->GetPlayerCoordinates(); // [1, n*m] 
 	std::vector<bool> B = state->GetBoxesCoordinates(); //  [1+n*m, 2*n*m]
 	std::vector<bool> W = table->GetWalls();
+	
 	
 	if(type==0) {   // up
 		Formula tmp_atom;
@@ -44,8 +45,8 @@ Formula Move::MovePrecondition() const {
 		
 		Formula first = std::make_shared<True>();
 		tmp_vector.push_back(first);
-		for(i=0; i<m; i++) {
-			tmp_atom = std::make_shared<Atom>(i+1);
+		for(i=0; i<m; i++) {       
+			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -57,8 +58,8 @@ Formula Move::MovePrecondition() const {
 		int vector_size = tmp_vector.size();
 		for(i=m; i<n*m; i++) {
 			if(!W[i-m]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i+1-m+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m-m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -74,7 +75,7 @@ Formula Move::MovePrecondition() const {
 		first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		for(i=0; i<2*m; i++) {
-			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -88,8 +89,8 @@ Formula Move::MovePrecondition() const {
 		vector_size = tmp_vector.size();
 		for(i=2*m; i<n*m; i++) {
 			if(!W[i-2*m]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i+1-2*m+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m-2*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -106,7 +107,7 @@ Formula Move::MovePrecondition() const {
 		
 		for(i=m; i<n*m; i++) {
 			if(!W[i-m]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
 				vector_size++;
 				tmp_vector.push_back(tmp_or);
@@ -131,7 +132,7 @@ Formula Move::MovePrecondition() const {
 		Formula first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		for(i=n*m-m; i<n*m; i++) {
-			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -143,8 +144,8 @@ Formula Move::MovePrecondition() const {
 		int vector_size = tmp_vector.size();
 		for(i=0; i<n*m-m; i++) {
 			if(!W[i+m]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i+1+m+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m+m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -160,7 +161,7 @@ Formula Move::MovePrecondition() const {
 		first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		for(i=n*m-2*m; i<n*m; i++) {
-			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -174,8 +175,8 @@ Formula Move::MovePrecondition() const {
 		vector_size = tmp_vector.size();
 		for(i=0; i<n*m-2*m; i++) {
 			if(!W[i+2*m]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i+1+2*m+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m+2*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -192,7 +193,7 @@ Formula Move::MovePrecondition() const {
 		
 		for(i=0; i<n*m-m; i++) {
 			if(!W[i+m]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
 				vector_size++;
 				tmp_vector.push_back(tmp_or);
@@ -206,6 +207,7 @@ Formula Move::MovePrecondition() const {
 	}
 	
 	if(type==2) { // left
+	
 	Formula tmp_atom;
 		Formula tmp_box;
 		Formula tmp_not;
@@ -216,7 +218,7 @@ Formula Move::MovePrecondition() const {
 		Formula first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		for(i=0; i<n; i++) {
-			tmp_atom = std::make_shared<Atom>(i*m+1);
+			tmp_atom = std::make_shared<Atom>(1+2*(k-1)*n*m+i*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -230,8 +232,8 @@ Formula Move::MovePrecondition() const {
 			if(i%m==0)
 				continue;
 			if(!W[i-1]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+2*(k-1)*n*m+n*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -247,11 +249,11 @@ Formula Move::MovePrecondition() const {
 		first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		for(i=0; i<n; i++) { 
-			tmp_atom = std::make_shared<Atom>(i*m+1);
+			tmp_atom = std::make_shared<Atom>(1+2*(k-1)*n*m+i*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
-			tmp_atom = std::make_shared<Atom>(i*m+2);
+			tmp_atom = std::make_shared<Atom>(2+2*(k-1)*n*m+i*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -267,8 +269,8 @@ Formula Move::MovePrecondition() const {
 			if(i%m==0 || i%m==1)
 				continue;
 			if(!W[i-2]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i-1+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i-1+2*(k-1)*n*m+n*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -287,7 +289,7 @@ Formula Move::MovePrecondition() const {
 			if(i%m==0)
 				continue;
 			if(!W[i-1]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
 				vector_size++;
 				tmp_vector.push_back(tmp_or);
@@ -301,17 +303,18 @@ Formula Move::MovePrecondition() const {
 	
 	}
 	if(type==3) { // right
+	
 	Formula tmp_atom;
 		Formula tmp_box;
 		Formula tmp_not;
 		Formula tmp_and;
 		Formula tmp_or;
 		std::vector<Formula> tmp_vector;
-		
+	
 		Formula first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		for(i=1; i<=n; i++) {
-			tmp_atom = std::make_shared<Atom>(i*m);
+			tmp_atom = std::make_shared<Atom>(2*(k-1)*n*m + i*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -325,8 +328,8 @@ Formula Move::MovePrecondition() const {
 			if((i+1)%m==0)
 				continue;
 			if(!W[i+1]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i+2+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+2+2*(k-1)*n*m+n*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -342,11 +345,11 @@ Formula Move::MovePrecondition() const {
 		first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		for(i=1; i<=n; i++) {
-			tmp_atom = std::make_shared<Atom>(i*m);
+			tmp_atom = std::make_shared<Atom>(2*(k-1)*n*m+i*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
-			tmp_atom = std::make_shared<Atom>(i*m-1);
+			tmp_atom = std::make_shared<Atom>(2*(k-1)*n*m+i*m-1);
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
 			tmp_vector.push_back(tmp_and);
@@ -362,8 +365,8 @@ Formula Move::MovePrecondition() const {
 			if((i+1)%m==0 || (i+2)%m==0)
 				continue;
 			if(!W[i+2]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
-				tmp_box = std::make_shared<Atom>(i+3+n*m);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m );
+				tmp_box = std::make_shared<Atom>(i+3+2*(k-1)*n*m+n*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
 				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
@@ -382,7 +385,7 @@ Formula Move::MovePrecondition() const {
 			if((i+1)%m==0)
 				continue;
 			if(!W[i+1]) {
-				tmp_atom = std::make_shared<Atom>(i+1);
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
 				vector_size++;
 				tmp_vector.push_back(tmp_or);
@@ -396,6 +399,9 @@ Formula Move::MovePrecondition() const {
 	}
 	
 }
+
+
+
 
 
 Move::~Move() {
@@ -504,37 +510,4 @@ void Sokoban::PrintTable() const {
 	std::cout << std::endl;
 }
 
-
-
-int main() {
-
-	std::vector<std::string> tmp;
-	tmp.push_back("   #####");
-	tmp.push_back("###   # ");
-	tmp.push_back("#osb  # ");
-	tmp.push_back("### bo# ");
-	tmp.push_back("#o##b # ");
-	tmp.push_back("# # o ##");
-	tmp.push_back("#b Bbbo#");
-	tmp.push_back("#   o  #");
-	tmp.push_back("########");
-
-
-	int plan_length;
-	std::cout << "Upisati duzinu plana: ";
-	std::cin >> plan_length;
-
-
-	Sokoban s(plan_length, tmp);
-
-	s.PrintTable();
-	
-	Move m(0, s.GetTable(), s.GetState());
-	
-	Formula f = m.MovePrecondition();
-	f->PrintFormula();
-	
-
-	return 0;
-}
 
