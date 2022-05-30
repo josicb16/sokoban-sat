@@ -58,6 +58,7 @@ class Sokoban {
 	public:
 		Sokoban(int _plan_length, std::vector<std::string> table);
 		~Sokoban();
+		// Formula prvi_uslov(koji opisuje gde se Sokoban na pocetku nalazi na tabli)
 		Table *GetTable() const;
 		State *GetState() const;
 		void PrintTable() const;

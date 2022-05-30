@@ -34,368 +34,229 @@ Formula Move::MovePrecondition() const {
 	std::vector<bool> B = state->GetBoxesCoordinates(); //  [1+n*m, 2*n*m]
 	std::vector<bool> W = table->GetWalls();
 	
+	Formula res;
 	
-	if(type==0) {   // up
-		Formula tmp_atom;
-		Formula tmp_box;
-		Formula tmp_not;
-		Formula tmp_and;
-		Formula tmp_or;
-		std::vector<Formula> tmp_vector;
+	Formula tmp_atom;
+	Formula tmp_and;
+	Formula tmp_box;
+	Formula tmp_not;
+	Formula tmp_or;
+	Formula tmp_impl;
+	
+	if(type==0) {   // gore
 		
-		Formula first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=0; i<m; i++) {       
+		// Sokoban se ne nalazi u nultom redu 
+		tmp_atom = std::make_shared<Atom>(1+2*(k-1)*n*m);
+		
+		res = std::make_shared<Not>(tmp_atom);
+		
+		for(i=1; i<m; i++) {
 			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
+			
+			res = std::make_shared<And>(res, tmp_not);
 		}
 		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-
-		int vector_size = tmp_vector.size();
+		// Iznad Sokobana se ne nalazi zid
 		for(i=m; i<n*m; i++) {
-			if(!W[i-m]) {
+			if(W[i-m]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m-m);
-				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				tmp_not = std::make_shared<Not>(tmp_atom);
+				
+				res = std::make_shared<And>(res, tmp_not);
 			}
-		} 
-		
-		Formula first_condition = std::make_shared<And>(tmp_vector[m], tmp_vector[vector_size-1]);
-		
-		tmp_vector.clear();
-		
-		first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=0; i<2*m; i++) {
-			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
 		}
 		
-		int first_size = tmp_vector.size();
-		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-		
-		vector_size = tmp_vector.size();
+		// Ako je iznad Sokobana kutija, onda iznad kutije ne smeju biti ni zid ni kutija
 		for(i=2*m; i<n*m; i++) {
-			if(!W[i-2*m]) {
+			if(W[i-2*m]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m-2*m);
+				tmp_box = std::make_shared<Atom>(i+1-m+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				tmp_not = std::make_shared<Not>(tmp_and);
+				
+				res = std::make_shared<And>(res, tmp_not);
+			}
+			else {
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+1-m+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				
+				tmp_box = std::make_shared<Atom>(i+1-2*m+n*m+2*(k-1)*n*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				
+				tmp_impl = std::make_shared<Impl>(tmp_and, tmp_not);
+				
+				res = std::make_shared<And>(res, tmp_impl);
 			}
 		}
 		
-		int second = vector_size;
-		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first);
-		vector_size++;
-		
-		for(i=m; i<n*m; i++) {
-			if(!W[i-m]) {
-				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
-			}
-		}
-
-		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
-		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
-		
-		return std::make_shared<Or>(first_condition, second_condition);
+		return res;
 		
 	}
 	
-	if(type==1) { // down
-		Formula tmp_atom;
-		Formula tmp_box;
-		Formula tmp_not;
-		Formula tmp_and;
-		Formula tmp_or;
-		std::vector<Formula> tmp_vector;
+	if(type==1) { // dole
 		
-		Formula first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=n*m-m; i<n*m; i++) {
+		// Sokoban se ne nalazi u poslednjem redu 
+		tmp_atom = std::make_shared<Atom>(n*m-m+1+2*(k-1)*n*m);
+		
+		res = std::make_shared<Not>(tmp_atom);
+		
+		for(i=n*m-m+1; i<n*m; i++) {
 			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
+			
+			res = std::make_shared<And>(res, tmp_not);
 		}
 		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-
-		int vector_size = tmp_vector.size();
+		// Ispod Sokobana se ne nalazi zid
 		for(i=0; i<n*m-m; i++) {
-			if(!W[i+m]) {
+			if(W[i+m]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m+m);
-				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				tmp_not = std::make_shared<Not>(tmp_atom);
+				
+				res = std::make_shared<And>(res, tmp_not);
 			}
-		} 
-		
-		Formula first_condition = std::make_shared<And>(tmp_vector[m], tmp_vector[vector_size-1]);
-		
-		tmp_vector.clear();
-		
-		first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=n*m-2*m; i<n*m; i++) {
-			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
 		}
 		
-		int first_size = tmp_vector.size();
-		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-		
-		vector_size = tmp_vector.size();
+		// Ako je ispod Sokobana kutija, onda ispod kutije ne smeju biti ni zid ni kutija
 		for(i=0; i<n*m-2*m; i++) {
-			if(!W[i+2*m]) {
+			if(W[i+2*m]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_box = std::make_shared<Atom>(i+1+2*(k-1)*n*m+n*m+2*m);
+				tmp_box = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				tmp_not = std::make_shared<Not>(tmp_and);
+				
+				res = std::make_shared<And>(res, tmp_not);
+			}
+			else {
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				
+				tmp_box = std::make_shared<Atom>(i+1+2*m+n*m+2*(k-1)*n*m);
 				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				
+				tmp_impl = std::make_shared<Impl>(tmp_and, tmp_not);
+				
+				res = std::make_shared<And>(res, tmp_impl);
 			}
 		}
 		
-		int second = vector_size;
+		return res;
 		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first);
-		vector_size++;
-		
-		for(i=0; i<n*m-m; i++) {
-			if(!W[i+m]) {
-				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
-			}
-		}
-
-		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
-		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
-		
-		return std::make_shared<Or>(first_condition, second_condition);
 	}
 	
-	if(type==2) { // left
+	if(type==2) { // levo
 	
-	Formula tmp_atom;
-		Formula tmp_box;
-		Formula tmp_not;
-		Formula tmp_and;
-		Formula tmp_or;
-		std::vector<Formula> tmp_vector;
+		// Sokoban se ne nalazi u nultoj koloni 
+		tmp_atom = std::make_shared<Atom>(1+2*(k-1)*n*m);
 		
-		Formula first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=0; i<n; i++) {
-			tmp_atom = std::make_shared<Atom>(1+2*(k-1)*n*m+i*m);
+		res = std::make_shared<Not>(tmp_atom);
+		
+		for(i=m; i<n*m-m+1; i+=m) {
+			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
+			
+			res = std::make_shared<And>(res, tmp_not);
 		}
 		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-
-		int vector_size = tmp_vector.size();
+		// Levo od Sokobana se ne nalazi zid
 		for(i=0; i<n*m; i++) {
 			if(i%m==0)
 				continue;
-			if(!W[i-1]) {
+			if(W[i-1]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_box = std::make_shared<Atom>(i+2*(k-1)*n*m+n*m);
-				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
-			}
-		} 
-		
-		Formula first_condition = std::make_shared<And>(tmp_vector[n], tmp_vector[vector_size-1]);
-		
-		tmp_vector.clear();
-		
-		first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=0; i<n; i++) { 
-			tmp_atom = std::make_shared<Atom>(1+2*(k-1)*n*m+i*m);
-			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
-			tmp_atom = std::make_shared<Atom>(2+2*(k-1)*n*m+i*m);
-			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
-		}
-		
-		int first_size = tmp_vector.size();
-		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-		
-		vector_size = tmp_vector.size();
-		for(i=0; i<n*m; i++) {   
-			if(i%m==0 || i%m==1)
-				continue;
-			if(!W[i-2]) {
-				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_box = std::make_shared<Atom>(i-1+2*(k-1)*n*m+n*m);
-				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				tmp_not = std::make_shared<Not>(tmp_atom);
+				
+				res = std::make_shared<And>(res, tmp_not);
 			}
 		}
 		
-		int second = vector_size;
-		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first);
-		vector_size++;
-		
+		// Ako je levo od Sokobana kutija, onda levo od kutije ne smeju biti ni zid ni kutija
 		for(i=0; i<n*m; i++) {
-			if(i%m==0)
+			if(i%m==0 || (i-1)%m==0)
 				continue;
-			if(!W[i-1]) {
+			if(W[i-2]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				tmp_box = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				tmp_not = std::make_shared<Not>(tmp_and);
+				
+				res = std::make_shared<And>(res, tmp_not);
+			}
+			else {
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				
+				tmp_box = std::make_shared<Atom>(i-1+n*m+2*(k-1)*n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				
+				tmp_impl = std::make_shared<Impl>(tmp_and, tmp_not);
+				
+				res = std::make_shared<And>(res, tmp_impl);
 			}
 		}
-
-		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
-		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
 		
-		return std::make_shared<Or>(first_condition, second_condition);
+		return res;
 	
 	}
-	if(type==3) { // right
+	if(type==3) { // desno
 	
-	Formula tmp_atom;
-		Formula tmp_box;
-		Formula tmp_not;
-		Formula tmp_and;
-		Formula tmp_or;
-		std::vector<Formula> tmp_vector;
-	
-		Formula first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=1; i<=n; i++) {
-			tmp_atom = std::make_shared<Atom>(2*(k-1)*n*m + i*m);
+		// Sokoban se ne nalazi u poslednjoj koloni 
+		tmp_atom = std::make_shared<Atom>(m+2*(k-1)*n*m);
+		
+		res = std::make_shared<Not>(tmp_atom);
+		
+		for(i=2*m-1; i<n*m; i+=m) {
+			tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
+			
+			res = std::make_shared<And>(res, tmp_not);
 		}
 		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-
-		int vector_size = tmp_vector.size();
-		for(i=0; i<n*m; i++) { 
+		// Desno od Sokobana se ne nalazi zid
+		for(i=0; i<n*m; i++) {
 			if((i+1)%m==0)
 				continue;
-			if(!W[i+1]) {
+			if(W[i+1]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_box = std::make_shared<Atom>(i+2+2*(k-1)*n*m+n*m);
-				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				tmp_not = std::make_shared<Not>(tmp_atom);
+				
+				res = std::make_shared<And>(res, tmp_not);
 			}
-		} 
-		
-		Formula first_condition = std::make_shared<And>(tmp_vector[n], tmp_vector[vector_size-1]);
-		
-		tmp_vector.clear();
-		
-		first = std::make_shared<True>();
-		tmp_vector.push_back(first);
-		for(i=1; i<=n; i++) {
-			tmp_atom = std::make_shared<Atom>(2*(k-1)*n*m+i*m);
-			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
-			tmp_atom = std::make_shared<Atom>(2*(k-1)*n*m+i*m-1);
-			tmp_not = std::make_shared<Not>(tmp_atom);
-			tmp_and = std::make_shared<And>(tmp_vector[i], tmp_not);
-			tmp_vector.push_back(tmp_and);
 		}
 		
-		int first_size = tmp_vector.size();
 		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first); 
-		
-		vector_size = tmp_vector.size();
-		for(i=0; i<n*m; i++) { 
+		// Ako je desno od Sokobana kutija, onda desno od kutije ne smeju biti ni zid ni kutija
+		for(i=0; i<n*m; i++) {
 			if((i+1)%m==0 || (i+2)%m==0)
 				continue;
-			if(!W[i+2]) {
-				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m );
-				tmp_box = std::make_shared<Atom>(i+3+2*(k-1)*n*m+n*m);
-				tmp_not = std::make_shared<Not>(tmp_box);
-				tmp_and = std::make_shared<And>(tmp_atom, tmp_not);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_and);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
-			}
-		}
-		
-		int second = vector_size;
-		
-		first = std::make_shared<False>();
-		tmp_vector.push_back(first);
-		vector_size++;
-		
-		for(i=0; i<n*m; i++) {
-			if((i+1)%m==0)
-				continue;
-			if(!W[i+1]) {
+			if(W[i+2]) {
 				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-				tmp_or = std::make_shared<Or>(tmp_vector[vector_size-1], tmp_atom);
-				vector_size++;
-				tmp_vector.push_back(tmp_or);
+				tmp_box = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				tmp_not = std::make_shared<Not>(tmp_and);
+				
+				res = std::make_shared<And>(res, tmp_not);
+			}
+			else {
+				tmp_atom = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+				tmp_box = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
+				tmp_and = std::make_shared<And>(tmp_atom, tmp_box);
+				
+				tmp_box = std::make_shared<Atom>(i+3+n*m+2*(k-1)*n*m);
+				tmp_not = std::make_shared<Not>(tmp_box);
+				
+				tmp_impl = std::make_shared<Impl>(tmp_and, tmp_not);
+				
+				res = std::make_shared<And>(res, tmp_impl);
 			}
 		}
-
-		tmp_and = std::make_shared<And>(tmp_vector[first_size-1], tmp_vector[second-1]);
-		Formula second_condition = std::make_shared<And>(tmp_and, tmp_vector[vector_size-1]);
 		
-		return std::make_shared<Or>(first_condition, second_condition);
+		return res;
+		
 	}
 	
 }
@@ -488,6 +349,7 @@ Formula Move::MoveEffect() const {
 	else if(type==1) {  // down
 	
 		Formula tmp_atom1;
+		Formula tmp_atom;
 		Formula tmp_atom2;
 		Formula tmp_eql;
 		Formula tmp_and;
@@ -850,5 +712,3 @@ void Sokoban::PrintTable() const {
 	}
 	std::cout << std::endl;
 }
-
-
