@@ -25,7 +25,7 @@ std::string Move::GetType() const {
 
 
 
-Formula Move::MovePrecondition(int k) const {
+Formula Move::MovePrecondition() const {
 	int n = table->GetN();
 	int m = table->GetM();
 	int i;
@@ -401,6 +401,166 @@ Formula Move::MovePrecondition(int k) const {
 }
 
 
+Formula Move::MoveEffect() const {
+	int n = table->GetN();
+	int m = table->GetM();
+	int i;
+	
+	std::vector<bool> S = state->GetPlayerCoordinates();
+	std::vector<bool> B = state->GetBoxesCoordinates(); 
+	std::vector<bool> W = table->GetWalls();
+	
+	if(type==0) {  // up
+		
+		Formula tmp_atom1;
+		Formula tmp_atom2;
+		Formula tmp_eql;
+		Formula tmp_and;
+		Formula tmp_impl;
+		Formula tmp_box;
+		std::vector<Formula> tmp_vector;
+			
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		
+		for(i=m; i<n*m; i++) {
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+1-m+2*k*n*m);
+			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_vector[i-m], tmp_eql);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int size_first = tmp_vector.size();
+		
+			
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		int vector_dimension = size_first + 1;
+		
+		for(i=2*m; i<n*m; i++) {
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+1-m+n*m+2*(k-1)*n*m);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
+			tmp_box = std::make_shared<Atom>(i+1+n*m-2*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		Formula first_effect = std::make_shared<And>(tmp_vector[size_first-1], tmp_vector[vector_dimension-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		vector_dimension = 1;
+		
+		Formula tmp_not;
+		
+		for(i=2*m; i<n*m; i++) {
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m); 
+			tmp_atom2 = std::make_shared<Atom>(i+1-m+n*m+2*(k-1)*n*m);
+			tmp_not = std::make_shared<Not>(tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
+			tmp_box = std::make_shared<Atom>(i+1-m+n*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		return std::make_shared<And>(first_effect, tmp_vector[vector_dimension-1]);
+			
+	}
+	else if(type==1) {  // down
+	
+		Formula tmp_atom1;
+		Formula tmp_atom2;
+		Formula tmp_eql;
+		Formula tmp_and;
+		Formula tmp_impl;
+		Formula tmp_box;
+		std::vector<Formula> tmp_vector;
+			
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		
+		for(i=0; i<n*m-m; i++) {
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+1+m+2*k*n*m);
+			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_vector[i-m], tmp_eql);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int size_first = tmp_vector.size();
+		
+			
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		int vector_dimension = size_first + 1;
+		
+		for(i=0; i<n*m-2*m; i++) {
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
+			tmp_box = std::make_shared<Atom>(i+1+n*m+2*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		Formula first_effect = std::make_shared<And>(tmp_vector[size_first-1], tmp_vector[vector_dimension-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		vector_dimension = 1;
+		
+		Formula tmp_not;
+
+		for(i=0; i<n*m-2*m; i++) {
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m); 
+			tmp_atom2 = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
+			tmp_not = std::make_shared<Not>(tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
+			tmp_box = std::make_shared<Atom>(i+1+m+n*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		return std::make_shared<And>(first_effect, tmp_vector[vector_dimension-1]);
+
+		
+	}
+	/*
+	else if(type == 2) { // left
+		
+	}
+	else if(type==3) { // right
+		
+	}
+	*/
+	
+}
 
 
 
@@ -436,24 +596,24 @@ Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 		for(j=0; j<m; j++) {
 			switch(table_str[i][j]) {
 				case '#':  // wall
-					walls[j*m+i] = true;
+					walls[i*m+j] = true;
 					break;
 				case 'o':  // box_home
-					box_home[j*m+i] = true;
+					box_home[i*m+j] = true;
 					break;
 				case 's':  // Sokoban
-					player_coordinates[j*m+i] = true;
+					player_coordinates[i*m+j] = true;
 					break;
 				case 'S':  // Sokoban; box_home
-					player_coordinates[j*m+i] = true;
-					box_home[j*m+i] = true;
+					player_coordinates[i*m+j] = true;
+					box_home[i*m+j] = true;
 					break;
 				case 'b':  // box
-					boxes_coordinates[j*m+i] = true;
+					boxes_coordinates[i*m+j] = true;
 					break;
 				case 'B':  // box; box_home
-					boxes_coordinates[j*m+i] = true;
-					box_home[j*m+i] = true;
+					boxes_coordinates[i*m+j] = true;
+					box_home[i*m+j] = true;
 					break;
 				default: // empty space
 					continue;
@@ -482,24 +642,24 @@ void Sokoban::PrintTable() const {
 	int i, j;
 	for(i=0; i<n; i++) {
 		for(j=0; j<m; j++) {
-			if(walls[j*m+i]) {
+			if(walls[i*m+j]) {
 				std::cout << "#";
 				continue;
 			}
-			else if(box_home[j*m+i]) {
-				if(boxes_coordinates[j*m+i]) 
+			else if(box_home[i*m+j]) {
+				if(boxes_coordinates[i*m+j]) 
 					std::cout << "B";
-				else if(player_coordinates[j*m+i])
+				else if(player_coordinates[i*m+j])
 					std::cout << "S";
 				else
 					std::cout << "o";
 				continue;
 			}
-			else if(player_coordinates[j*m+i]) {
+			else if(player_coordinates[i*m+j]) {
 				std::cout << "s";
 				continue;
 			}
-			else if(boxes_coordinates[j*m+i]) {
+			else if(boxes_coordinates[i*m+j]) {
 				std::cout << "b";
 				continue;
 			}
