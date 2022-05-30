@@ -408,27 +408,33 @@ Formula Move::MoveEffect() const {
 	
 	std::vector<bool> S = state->GetPlayerCoordinates();
 	std::vector<bool> B = state->GetBoxesCoordinates(); 
-	std::vector<bool> W = table->GetWalls();
 	
 	if(type==0) {  // up
 		
 		Formula tmp_atom1;
 		Formula tmp_atom2;
 		Formula tmp_eql;
+		Formula tmp_atom;
 		Formula tmp_and;
 		Formula tmp_impl;
 		Formula tmp_box;
+		Formula tmp_not;
 		std::vector<Formula> tmp_vector;
 			
 		Formula first = std::make_shared<True>();
 		tmp_vector.push_back(first);
-		
+		int j = 0;
+		for(i=n*m-m; i<n*m; i++) {
+			tmp_atom = std::make_shared<Atom>(i+1+2*k*n*m);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[j++], tmp_not);
+		}
 		
 		for(i=m; i<n*m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1-m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_vector[i-m], tmp_eql);
+			tmp_and = std::make_shared<And>(tmp_vector[i-1], tmp_eql);
 			tmp_vector.push_back(tmp_and);
 		}
 		
@@ -461,7 +467,6 @@ Formula Move::MoveEffect() const {
 		tmp_vector.push_back(first);
 		vector_dimension = 1;
 		
-		Formula tmp_not;
 		
 		for(i=2*m; i<n*m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m); 
@@ -488,17 +493,27 @@ Formula Move::MoveEffect() const {
 		Formula tmp_and;
 		Formula tmp_impl;
 		Formula tmp_box;
+		Formula tmp_not;
 		std::vector<Formula> tmp_vector;
 			
 		Formula first = std::make_shared<True>();
 		tmp_vector.push_back(first);
 		
+		int j = 0;
+		for(i=0; i<m; i++) {
+			tmp_atom = std::make_shared<Atom>(i+1+2*k*n*m);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			tmp_and = std::make_shared<And>(tmp_vector[j++], tmp_not);
+		}
+		
+		int s = tmp_vector.size();
 		
 		for(i=0; i<n*m-m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_vector[i-m], tmp_eql);
+			tmp_and = std::make_shared<And>(tmp_vector[s-1], tmp_eql);
+			s++;
 			tmp_vector.push_back(tmp_and);
 		}
 		
@@ -531,7 +546,6 @@ Formula Move::MoveEffect() const {
 		tmp_vector.push_back(first);
 		vector_dimension = 1;
 		
-		Formula tmp_not;
 
 		for(i=0; i<n*m-2*m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m); 
@@ -551,14 +565,181 @@ Formula Move::MoveEffect() const {
 
 		
 	}
-	/*
 	else if(type == 2) { // left
+
+		Formula tmp_atom1;
+		Formula tmp_atom2;
+		Formula tmp_atom;
+		Formula tmp_eql;
+		Formula tmp_and;
+		Formula tmp_impl;
+		Formula tmp_box;
+		Formula tmp_not;
+		std::vector<Formula> tmp_vector;
+		
+		
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		int s = 0;
+		
+		for(i=0; i<n*m; i++) {
+			if(i%m==0)
+				continue;
+			if(i%(m-1)==0) {
+				tmp_atom = std::make_shared<Atom>(i+1+2*k*n*m);
+				tmp_not = std::make_shared<Not>(tmp_atom);
+				tmp_and = std::make_shared<And>(tmp_vector[s++], tmp_not);
+				tmp_vector.push_back(tmp_and);
+				continue;
+			}
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+2*k*n*m);
+			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_vector[s++], tmp_eql);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int size_first = tmp_vector.size();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		int vector_dimension = size_first + 1;
+		
+		for(i=0; i<n*m; i++) {
+			if(i%m==0)
+				continue;
+			if((i-1)%m==0)
+				continue;
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
+			tmp_box = std::make_shared<Atom>(i-1+n*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		Formula first_effect = std::make_shared<And>(tmp_vector[size_first-1], tmp_vector[vector_dimension-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		vector_dimension = 1;
+		
+		for(i=0; i<n*m; i++) {
+			if(i%m==0)
+				continue;
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m); 
+			tmp_atom2 = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
+			tmp_not = std::make_shared<Not>(tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
+			tmp_box = std::make_shared<Atom>(i+n*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		return std::make_shared<And>(first_effect, tmp_vector[vector_dimension-1]);
+		
+		
 		
 	}
 	else if(type==3) { // right
 		
+		Formula tmp_atom1;
+		Formula tmp_atom2;
+		Formula tmp_atom;
+		Formula tmp_eql;
+		Formula tmp_and;
+		Formula tmp_impl;
+		Formula tmp_box;
+		Formula tmp_not;
+		std::vector<Formula> tmp_vector;
+		
+		
+		Formula first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		int s = 0;
+		
+		for(i=0; i<n*m; i++) {
+			if((i+1)%m==0)
+				continue;
+			if(i%m==0) {
+				tmp_atom = std::make_shared<Atom>(i+1+2*k*n*m);
+				tmp_not = std::make_shared<Not>(tmp_atom);
+				tmp_and = std::make_shared<And>(tmp_vector[s++], tmp_not);
+				tmp_vector.push_back(tmp_and);
+				continue;
+			}
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+2+2*k*n*m);
+			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_vector[s++], tmp_eql);
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		int size_first = tmp_vector.size();
+		
+
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		
+		int vector_dimension = size_first + 1;
+		
+		for(i=0; i<n*m; i++) {
+			if((i+1)%m==0)
+				continue;
+			if((i+2)%m==0)
+				continue;
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
+			tmp_box = std::make_shared<Atom>(i+3+n*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		Formula first_effect = std::make_shared<And>(tmp_vector[size_first-1], tmp_vector[vector_dimension-1]);
+		
+		tmp_vector.clear();
+		
+		first = std::make_shared<True>();
+		tmp_vector.push_back(first);
+		vector_dimension = 1;
+
+		
+		for(i=0; i<n*m; i++) {
+			if((i+1)%m==0)
+				continue;
+			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m); 
+			tmp_atom2 = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
+			tmp_not = std::make_shared<Not>(tmp_atom2);
+			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
+			tmp_box = std::make_shared<Atom>(i+2+n*m+2*k*n*m);
+			
+			tmp_impl = std::make_shared<Impl>(tmp_and, tmp_box);
+			
+			tmp_and = std::make_shared<And>(tmp_vector[vector_dimension-1], tmp_impl);
+			vector_dimension++;
+			tmp_vector.push_back(tmp_and);
+		}
+		
+		return std::make_shared<And>(first_effect, tmp_vector[vector_dimension-1]);
 	}
-	*/
 	
 }
 
