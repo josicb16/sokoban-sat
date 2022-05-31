@@ -39,26 +39,11 @@ class Table {
 };
 
 
-class Move {
-	public:
-		Move(short _type, int _k, Table *_table, State *_state) : type(_type), k(_k), table(_table), state(_state)  {	}  
-		~Move();
-		std::string GetType() const;
-		Formula MovePrecondition() const;
-		Formula MoveEffect() const;
-	private:
-		short type;
-		int k;
-		Table *table;
-		State *state;
-};
-
-
 class Sokoban {
 	public:
 		Sokoban(int _plan_length, std::vector<std::string> table);
 		~Sokoban();
-		// Formula prvi_uslov(koji opisuje gde se Sokoban na pocetku nalazi na tabli)
+		Formula GeneratePlanFormula() const;
 		Table *GetTable() const;
 		State *GetState() const;
 		void PrintTable() const;

@@ -14,25 +14,9 @@ std::vector<bool> Table::GetBoxHome() const { return box_home;}
 int Table::GetN() const { return n; }
 int Table::GetM() const { return m; }
 
-std::string Move::GetType() const {
-	switch(type) {
-		case(0): return "up";
-		case(1): return "down";
-		case(2): return "left";
-		case(3): return "right";
-	}
-}
 
-
-
-Formula Move::MovePrecondition() const {
-	int n = table->GetN();
-	int m = table->GetM();
+static Formula MovePrecondition(int type, int k, int n, int m, std::vector<bool> &S, std::vector<bool> &B, std::vector<bool> &W) {
 	int i;
-	
-	std::vector<bool> S = state->GetPlayerCoordinates(); // [1, n*m] 
-	std::vector<bool> B = state->GetBoxesCoordinates(); //  [1+n*m, 2*n*m]
-	std::vector<bool> W = table->GetWalls();
 	
 	Formula res;
 	
@@ -262,19 +246,16 @@ Formula Move::MovePrecondition() const {
 }
 
 
-Formula Move::MoveEffect() const {
-	int n = table->GetN();
-	int m = table->GetM();
-	int i;
+static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, std::vector<bool> &B) {
 	
-	std::vector<bool> S = state->GetPlayerCoordinates();
-	std::vector<bool> B = state->GetBoxesCoordinates(); 
+	int i;
 	
 	Formula res;
 	
 	Formula tmp_atom1;
 	Formula tmp_atom2;
 	Formula tmp_box;
+	Formula tmp_and;
 	Formula tmp_eql;
 	Formula tmp_impl;
 	Formula tmp_not;
@@ -351,7 +332,7 @@ Formula Move::MoveEffect() const {
 		
 		
 		// poslednji red 
-		for(i=n*m-m; i<n*m;; i++) {
+		for(i=n*m-m; i<n*m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
@@ -422,7 +403,7 @@ Formula Move::MoveEffect() const {
 			res = std::make_shared<And>(res, tmp_or);
 		}
 		
-		for(i=0; i<m;; i++) {
+		for(i=0; i<m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
@@ -500,7 +481,7 @@ Formula Move::MoveEffect() const {
 			res = std::make_shared<And>(res, tmp_or);
 		}
 
-		for(i=m-1; i<n*m;; i+=m) {
+		for(i=m-1; i<n*m; i+=m) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
@@ -576,7 +557,7 @@ Formula Move::MoveEffect() const {
 			res = std::make_shared<And>(res, tmp_or);
 		}
 
-		for(i=0; i<n*m;; i+=m) {
+		for(i=0; i<n*m; i+=m) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
@@ -590,12 +571,6 @@ Formula Move::MoveEffect() const {
 	
 }
 
-
-
-Move::~Move() {
-	delete table;
-	delete state;
-}
 
 
 Table *Sokoban::GetTable() const {
@@ -697,3 +672,116 @@ void Sokoban::PrintTable() const {
 	}
 	std::cout << std::endl;
 }
+
+
+Formula Sokoban::GeneratePlanFormula() const {
+	
+	int i;
+	
+	Formula plan_formula;
+	
+	Formula tmp_not;
+	Formula tmp_box;
+	Formula tmp_atom;
+	Formula tmp_or;
+	Formula tmp;
+	Formula tmp_operator;
+
+	
+	std::vector<bool> S = current_state->GetPlayerCoordinates(); // [1, n*m]
+	std::vector<bool> B = current_state->GetBoxesCoordinates();  // [1+n*m, 2*n*m]
+	std::vector<bool> W = table->GetWalls();
+	std::vector<bool> BH = table->GetBoxHome();
+	
+	int n = table->GetN();
+	int m = table->GetM();
+	
+	if(S[0]) {
+		plan_formula = std::make_shared<Atom>(1); // i+1+2*(k-1)*n*m
+	}
+	else {
+		tmp_not = std::make_shared<Atom>(1);
+		plan_formula = std::make_shared<Not>(tmp_not);
+	}
+	if(B[0]) {
+		tmp_box = std::make_shared<Atom>(1+n*m);
+		plan_formula = std::make_shared<And>(plan_formula, tmp_box);
+	}
+	else {
+		tmp_box = std::make_shared<Atom>(1+n*m);
+		tmp_not = std::make_shared<Not>(tmp_box);
+		plan_formula = std::make_shared<And>(plan_formula, tmp_not);
+	}
+	for(i=1; i<n*m; i++) {
+		if(S[i]) {
+			tmp_atom = std::make_shared<Atom>(i+1);
+			plan_formula = std::make_shared<And>(plan_formula, tmp_atom);
+		}
+		else {
+			tmp_atom = std::make_shared<Atom>(i+1);
+			tmp_not = std::make_shared<Not>(tmp_atom);
+			plan_formula = std::make_shared<And>(plan_formula, tmp_not);
+		}
+		if(B[0]) {
+			tmp_box = std::make_shared<Atom>(i+1+n*m);
+			plan_formula = std::make_shared<And>(plan_formula, tmp_box);
+		}
+		else {
+			tmp_box = std::make_shared<Atom>(i+1+n*m);
+			tmp_not = std::make_shared<Not>(tmp_box);
+			plan_formula = std::make_shared<And>(plan_formula, tmp_not);
+		}
+	}
+	
+	for(i=1; i<=plan_length; i++) {
+		tmp_operator = MovePrecondition(0, i, n, m, S, B, W); 
+		tmp = MoveEffect(0, i, n, m, S, B);
+		tmp_or = std::make_shared<And>(tmp_operator, tmp);
+		
+		tmp_operator = MovePrecondition(1, i, n, m, S, B, W); 
+		tmp = MoveEffect(1, i, n, m, S, B);
+		tmp_operator = std::make_shared<And>(tmp_operator, tmp);
+		tmp_or = std::make_shared<Or>(tmp_or, tmp_operator);
+		
+		tmp_operator = MovePrecondition(2, i, n, m, S, B, W); 
+		tmp = MoveEffect(2, i, n, m, S, B);
+		tmp_operator = std::make_shared<And>(tmp_operator, tmp);
+		tmp_or = std::make_shared<Or>(tmp_or, tmp_operator);
+		
+		tmp_operator = MovePrecondition(3, i, n, m, S, B, W); 
+		tmp = MoveEffect(3, i, n, m, S, B);
+		tmp_operator = std::make_shared<And>(tmp_operator, tmp);
+		tmp_or = std::make_shared<Or>(tmp_or, tmp_operator);
+		
+		plan_formula = std::make_shared<And>(plan_formula, tmp_or);
+		
+	}
+	
+	if(BH[0]) {
+		tmp_box = std::make_shared<Atom>(1+n*m+2*plan_length*n*m); 
+		plan_formula = std::make_shared<And>(plan_formula, tmp_box);
+	}
+	else {
+		tmp_box = std::make_shared<Atom>(1+n*m+2*plan_length*n*m);
+		tmp_not = std::make_shared<Not>(tmp_box);
+		plan_formula = std::make_shared<And>(plan_formula, tmp_not);
+	}
+	
+	
+	for(i=1; i<n*m; i++) {
+			if(BH[i]) {
+			tmp_box = std::make_shared<Atom>(i+1+n*m+2*plan_length*n*m); 
+			plan_formula = std::make_shared<And>(plan_formula, tmp_box);
+		}
+		else {
+			tmp_box = std::make_shared<Atom>(i+1+n*m+2*plan_length*n*m);
+			tmp_not = std::make_shared<Not>(tmp_box);
+			plan_formula = std::make_shared<And>(plan_formula, tmp_not);
+		}
+	}
+	
+	
+	return plan_formula;
+}
+
+
