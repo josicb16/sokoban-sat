@@ -193,12 +193,12 @@ Formula Eql::ToNNF() const {
 
 int True::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 	cnf.push_back({atom});
-	return atom+1;
+	return atom++;
 }
 
 int False::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 	cnf.push_back({-atom});
-	return atom+1;
+	return atom++;
 }
 
 int Atom::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
@@ -209,7 +209,7 @@ int Not::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 	int subformula = f->ToTseitinCNF(cnf, atom);
 	std::vector<std::vector<int>> tseitin_not = {{-subformula, -atom}, {subformula, atom}};
 	std::copy(begin(tseitin_not), end(tseitin_not), std::back_inserter(cnf));
-	return atom+1;
+	return atom++;
 }
 
 int And::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
@@ -219,7 +219,7 @@ int And::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 	std::vector<std::vector<int>> tseitin_and = {{-atom, l_atom}, {-atom, r_atom}, {atom, -l_atom, -r_atom}};
 	
 	std::copy(begin(tseitin_and), end(tseitin_and), std::back_inserter(cnf));
-	return atom+1;
+	return atom++;
 }
 
 int Or::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
@@ -229,7 +229,7 @@ int Or::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 	std::vector<std::vector<int>> tseitin_or = {{-atom, l_atom, r_atom}, {atom, -l_atom}, {atom, -r_atom}};
 	
 	std::copy(begin(tseitin_or), end(tseitin_or), std::back_inserter(cnf));
-	return atom+1;
+	return atom++;
 }
 
 int Impl::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
@@ -239,7 +239,7 @@ int Impl::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 	std::vector<std::vector<int>> tseitin_impl = {{-atom, -l_atom, r_atom}, {atom, l_atom}, {atom, -r_atom}};
 	
 	std::copy(begin(tseitin_impl), end(tseitin_impl), std::back_inserter(cnf));
-	return atom+1;
+	return atom++;
 }
 
 int Eql::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
@@ -249,7 +249,7 @@ int Eql::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 	std::vector<std::vector<int>> tseitin_eql = {{-atom, -l_atom, r_atom}, {-atom, l_atom, -r_atom}, {atom, l_atom, r_atom}, {atom, -l_atom, -r_atom}};
 	
 	std::copy(begin(tseitin_eql), end(tseitin_eql), std::back_inserter(cnf));
-	return atom+1;
+	return atom++;
 }
 
 

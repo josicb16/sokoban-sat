@@ -2,6 +2,7 @@
 #include "Formula.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <set>
@@ -722,7 +723,7 @@ Formula Sokoban::GeneratePlanFormula() const {
 			tmp_not = std::make_shared<Not>(tmp_atom);
 			plan_formula = std::make_shared<And>(plan_formula, tmp_not);
 		}
-		if(B[0]) {
+		if(B[i]) {
 			tmp_box = std::make_shared<Atom>(i+1+n*m);
 			plan_formula = std::make_shared<And>(plan_formula, tmp_box);
 		}
@@ -783,5 +784,7 @@ Formula Sokoban::GeneratePlanFormula() const {
 	
 	return plan_formula;
 }
+
+
 
 
