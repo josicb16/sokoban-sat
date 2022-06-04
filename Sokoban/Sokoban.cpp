@@ -261,7 +261,7 @@ static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
 		tmp_atom2 = std::make_shared<Atom>(1+n*m+2*k*n*m);
 		res = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
 
-		for(i=0; i<n*m; i++) {
+		for(i=1; i<n*m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
@@ -284,6 +284,7 @@ static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
 					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
 					tmp_not = std::make_shared<Not>(tmp_atom1);
 					res = std::make_shared<And>(res, tmp_not);
+					continue;
 				}
 				if(i==b-m)
 					continue;
@@ -308,6 +309,7 @@ static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
 					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
 					tmp_not = std::make_shared<Not>(tmp_atom1);
 					res = std::make_shared<And>(res, tmp_not);
+					continue;
 				}
 				if(i==b+m)
 					continue;
@@ -332,6 +334,7 @@ static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
 					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
 					tmp_not = std::make_shared<Not>(tmp_atom1);
 					res = std::make_shared<And>(res, tmp_not);
+					continue;
 				}
 				if(i==b-1)
 					continue;
@@ -357,6 +360,7 @@ static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
 					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
 					tmp_not = std::make_shared<Not>(tmp_atom1);
 					res = std::make_shared<And>(res, tmp_not);
+					continue;
 				}
 				if(i==b+1)
 					continue;
@@ -481,7 +485,7 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
 			
-			set_boxes = SetBoxes(0, k, n, m);  // raspored kutija se ne menja
+			set_boxes = SetBoxes(1, k, n, m);  // raspored kutija se ne menja
 		
 			tmp = std::make_shared<And>(tmp_and, set_boxes);
 			
@@ -495,7 +499,7 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			tmp_atom2 = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
 			
-			set_boxes = SetBoxes(0, k, n, m, i+m);
+			set_boxes = SetBoxes(1, k, n, m, i+m);
 			
 			tmp_and = std::make_shared<And>(tmp_and, set_boxes);
 			
@@ -543,7 +547,7 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
 			
-			set_boxes = SetBoxes(0, k, n, m);  // raspored kutija se ne menja
+			set_boxes = SetBoxes(2, k, n, m);  // raspored kutija se ne menja
 		
 			tmp = std::make_shared<And>(tmp_and, set_boxes);
 			
@@ -559,7 +563,7 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			tmp_atom2 = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
 			
-			set_boxes = SetBoxes(0, k, n, m, i-1);
+			set_boxes = SetBoxes(2, k, n, m, i-1);
 			
 			tmp_and = std::make_shared<And>(tmp_and, set_boxes);
 			
@@ -606,7 +610,7 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
 			
-			set_boxes = SetBoxes(0, k, n, m);  // raspored kutija se ne menja
+			set_boxes = SetBoxes(3, k, n, m);  // raspored kutija se ne menja
 		
 			tmp = std::make_shared<And>(tmp_and, set_boxes);
 			
@@ -622,7 +626,7 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			tmp_atom2 = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
 			
-			set_boxes = SetBoxes(0, k, n, m, i+1);
+			set_boxes = SetBoxes(3, k, n, m, i+1);
 			
 			tmp_and = std::make_shared<And>(tmp_and, set_boxes);
 			
