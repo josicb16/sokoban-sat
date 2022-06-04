@@ -246,6 +246,135 @@ static Formula MovePrecondition(int type, int k, int n, int m, std::vector<bool>
 	
 }
 
+static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
+	int i;
+	
+	Formula res;
+	Formula tmp_atom1;
+	Formula tmp_atom2;
+	Formula tmp_eql;
+	Formula tmp_not;
+	
+	
+	if(b==-1) {  // raspored kutija ostaje nepromenjen
+		tmp_atom1 = std::make_shared<Atom>(1+n*m+2*(k-1)*n*m);
+		tmp_atom2 = std::make_shared<Atom>(1+n*m+2*k*n*m);
+		res = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+
+		for(i=0; i<n*m; i++) {
+			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
+			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			res = std::make_shared<And>(res, tmp_eql);
+		}
+		
+		return res;
+	}
+	else {
+		// kutija na poziciji b se pomera, u zavisnosti od tipa operatora;
+		// pozicije ostalih kutija se ne menjaju.
+		if(type == 0) { // gore
+			tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(b+1-m+n*m+2*k*n*m);
+			
+			res = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			
+			for(i=0; i<n*m; i++) {
+				if(i==b) {
+					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
+					tmp_not = std::make_shared<Not>(tmp_atom1);
+					res = std::make_shared<And>(res, tmp_not);
+				}
+				if(i==b-m)
+					continue;
+				tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
+				tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
+				tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+				
+				res = std::make_shared<And>(res, tmp_eql);
+			}
+			
+			return res;
+			
+		}
+		else if(type == 1) { // dole
+			tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(b+1+m+n*m+2*k*n*m);
+			
+			res = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			
+			for(i=0; i<n*m; i++) {
+				if(i==b) {
+					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
+					tmp_not = std::make_shared<Not>(tmp_atom1);
+					res = std::make_shared<And>(res, tmp_not);
+				}
+				if(i==b+m)
+					continue;
+				tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
+				tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
+				tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+				
+				res = std::make_shared<And>(res, tmp_eql);
+			}
+			
+			return res;
+		}
+		else if(type == 2) { // levo
+		
+			tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(b+n*m+2*k*n*m);
+			
+			res = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			
+			for(i=0; i<n*m; i++) {
+				if(i==b) {
+					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
+					tmp_not = std::make_shared<Not>(tmp_atom1);
+					res = std::make_shared<And>(res, tmp_not);
+				}
+				if(i==b-1)
+					continue;
+				tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
+				tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
+				tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+				
+				res = std::make_shared<And>(res, tmp_eql);
+			}
+			
+			return res;
+			
+		}
+		else if(type == 3) { // desno
+		
+			tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*(k-1)*n*m);
+			tmp_atom2 = std::make_shared<Atom>(b+2+n*m+2*k*n*m);
+			
+			res = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+			
+			for(i=0; i<n*m; i++) {
+				if(i==b) {
+					tmp_atom1 = std::make_shared<Atom>(b+1+n*m+2*k*n*m);
+					tmp_not = std::make_shared<Not>(tmp_atom1);
+					res = std::make_shared<And>(res, tmp_not);
+				}
+				if(i==b+1)
+					continue;
+				tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
+				tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
+				tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
+				
+				res = std::make_shared<And>(res, tmp_eql);
+			}
+			
+			return res;
+			
+		}
+		
+	}
+	
+}
+
 
 static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, std::vector<bool> &B) {
 	
@@ -260,7 +389,10 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 	Formula tmp_eql;
 	Formula tmp_impl;
 	Formula tmp_not;
+	Formula tmp;
 	Formula tmp_or;
+	
+	Formula set_boxes;
 	
 	if(type==0) {  // gore
 		
@@ -285,61 +417,36 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 
 		// Ako iznad Sokobana nije bila kutija, raspored kutija ostaje nepromenjen,
 		// a ako je iznad Sokobana bila kutija, ona se pomera za jedno mesto gore
-
-		for(i=2*m; i<n*m; i++) {
+		tmp_or = std::make_shared<False>();
+		for(i=m; i<n*m; i++) {
+			// iznad sokobana nije kutija
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1-m+n*m+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
-			tmp_box = std::make_shared<Atom>(i+1-m+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom1 = std::make_shared<Atom>(i+1-2*m+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1-2*m+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
 			
-			tmp_or = std::make_shared<And>(tmp_and, tmp_eql);
+			set_boxes = SetBoxes(0, k, n, m);  // raspored kutija se ne menja
+		
+			tmp = std::make_shared<And>(tmp_and, set_boxes);
 			
+			tmp_or = std::make_shared<Or>(tmp_or, tmp);
+			
+		}
+		
+		for(i=2*m; i<n*m; i++) {
+			// iznad sokobana je kutija. 
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1-m+n*m+2*(k-1)*n*m);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
-			tmp_box = std::make_shared<Atom>(i+1-m+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom2 = std::make_shared<Atom>(i+1-2*m+n*m+2*k*n*m);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_atom2);
+			
+			set_boxes = SetBoxes(0, k, n, m, i-m);
+			
+			tmp_and = std::make_shared<And>(tmp_and, set_boxes);
 			
 			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-			tmp_not = std::make_shared<Not>(tmp_atom1);
-			tmp_atom1 = std::make_shared<Atom>(i+1-m+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1-m+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_not, tmp_eql);
-			tmp_atom1 = std::make_shared<Atom>(i+1-2*m+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1-2*m+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_eql);
-			
-			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			res = std::make_shared<And>(res, tmp_or);
 		}
-		// Za sve redove osim za poslednji:
-		//   (S[i] && ~B[i-m] && ~B_k[i-m]      && (B_k[i-2*m] <=> B[i-2*m])) || 
-		//   (S[i] && B[i-m] && ~B_k[i-m]    && B_k[i-2*m])  ||
-		//  (~S[i] && (B[i-m] <=> B_k[i-m]) && (B[i-2*m] <=> B_k[i-2*m]))
 		
-		
-		// poslednji red 
-		for(i=n*m-m; i<n*m; i++) {
-			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			
-			res = std::make_shared<And>(res, tmp_eql);
-		}
+		res = std::make_shared<And>(res, tmp_or);
 		
 		return res;
 		
@@ -350,7 +457,7 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 		tmp_atom2 = std::make_shared<Atom>(1+m+2*k*n*m);
 		res = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
 		
-		for(i=0; i<n*m-m; i++) {
+		for(i=1; i<n*m-m; i++) {
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+m+2*k*n*m);
 			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
@@ -363,54 +470,39 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			res = std::make_shared<And>(res, tmp_not);
 		}
 
-		for(i=0; i<n*m-2*m; i++) {
+
+		// Ako ispod Sokobana nije bila kutija, raspored kutija ostaje nepromenjen,
+		// a ako je ispod Sokobana bila kutija, ona se pomera za jedno mesto dole
+		tmp_or = std::make_shared<False>();
+		for(i=0; i<n*m-m; i++) {
+			// ispod sokobana nije kutija
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
-			tmp_box = std::make_shared<Atom>(i+1+m+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom1 = std::make_shared<Atom>(i+1+2*m+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1+2*m+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
 			
-			tmp_or = std::make_shared<And>(tmp_and, tmp_eql);
+			set_boxes = SetBoxes(0, k, n, m);  // raspored kutija se ne menja
+		
+			tmp = std::make_shared<And>(tmp_and, set_boxes);
 			
+			tmp_or = std::make_shared<Or>(tmp_or, tmp);
+			
+		}
+		
+		for(i=0; i<n*m-2*m; i++) {
+			// ispod sokobana je kutija. 
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
-			tmp_box = std::make_shared<Atom>(i+1+m+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom2 = std::make_shared<Atom>(i+1+2*m+n*m+2*k*n*m);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_atom2);
+			
+			set_boxes = SetBoxes(0, k, n, m, i+m);
+			
+			tmp_and = std::make_shared<And>(tmp_and, set_boxes);
 			
 			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-			tmp_not = std::make_shared<Not>(tmp_atom1);
-			tmp_atom1 = std::make_shared<Atom>(i+1+m+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1+m+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_not, tmp_eql);
-			tmp_atom1 = std::make_shared<Atom>(i+1+2*m+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1+2*m+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_eql);
-			
-			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			res = std::make_shared<And>(res, tmp_or);
 		}
 		
-		for(i=0; i<m; i++) {
-			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			
-			res = std::make_shared<And>(res, tmp_eql);
-		}
+		res = std::make_shared<And>(res, tmp_or);
 		
 		return res;
 	
@@ -437,60 +529,47 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			res = std::make_shared<And>(res, tmp_not);
 		}
-
-
+		
+		
+		// Ako levo od Sokobana nije bila kutija, raspored kutija ostaje nepromenjen,
+		// a ako je levo od Sokobana bila kutija, ona se pomera za jedno mesto ulevo
+		tmp_or = std::make_shared<False>();
 		for(i=0; i<n*m; i++) {
-			if(i%m==0 || (i-1)%m==0)
+			if(i%m==0)
 				continue;
+			// levo od sokobana nije kutija
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
-			tmp_box = std::make_shared<Atom>(i+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom1 = std::make_shared<Atom>(i-1+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i-1+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
 			
-			tmp_or = std::make_shared<And>(tmp_and, tmp_eql);
+			set_boxes = SetBoxes(0, k, n, m);  // raspored kutija se ne menja
+		
+			tmp = std::make_shared<And>(tmp_and, set_boxes);
 			
+			tmp_or = std::make_shared<Or>(tmp_or, tmp);
+			
+		}
+		
+		for(i=0; i<n*m; i++) {
+			if(i%m==0 || (i-1)%m==0)
+				continue;
+			// levo od sokobana je kutija. 
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
-			tmp_box = std::make_shared<Atom>(i+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom2 = std::make_shared<Atom>(i-1+n*m+2*k*n*m);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_atom2);
+			
+			set_boxes = SetBoxes(0, k, n, m, i-1);
+			
+			tmp_and = std::make_shared<And>(tmp_and, set_boxes);
 			
 			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-			tmp_not = std::make_shared<Not>(tmp_atom1);
-			tmp_atom1 = std::make_shared<Atom>(i+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_not, tmp_eql);
-			tmp_atom1 = std::make_shared<Atom>(i-1+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i-1+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_eql);
-			
-			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			res = std::make_shared<And>(res, tmp_or);
-		}
-
-		for(i=m-1; i<n*m; i+=m) {
-			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			
-			res = std::make_shared<And>(res, tmp_eql);
 		}
 		
+		res = std::make_shared<And>(res, tmp_or);
+		
 		return res;
+		
 		
 	}
 	else if(type==3) { // desno
@@ -514,57 +593,43 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 			res = std::make_shared<And>(res, tmp_not);
 		}
 
-
+		
+		// Ako levo od Sokobana nije bila kutija, raspored kutija ostaje nepromenjen,
+		// a ako je levo od Sokobana bila kutija, ona se pomera za jedno mesto ulevo
+		tmp_or = std::make_shared<False>();
 		for(i=0; i<n*m; i++) {
-			if((i+1)%m==0 || (i+2)%m==0)
+			if((i+1)%m==0)
 				continue;
+			// levo od sokobana nije kutija
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
 			tmp_not = std::make_shared<Not>(tmp_atom2);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_not);
-			tmp_box = std::make_shared<Atom>(i+2+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom1 = std::make_shared<Atom>(i+3+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+3+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
 			
-			tmp_or = std::make_shared<And>(tmp_and, tmp_eql);
+			set_boxes = SetBoxes(0, k, n, m);  // raspored kutija se ne menja
+		
+			tmp = std::make_shared<And>(tmp_and, set_boxes);
 			
+			tmp_or = std::make_shared<Or>(tmp_or, tmp);
+			
+		}
+		
+		for(i=0; i<n*m; i++) {
+			if((i+1)%m==0 || (i+2)%m==0)
+				continue;
+			// levo od sokobana je kutija. 
 			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
 			tmp_atom2 = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
 			tmp_and = std::make_shared<And>(tmp_atom1, tmp_atom2);
-			tmp_box = std::make_shared<Atom>(i+2+n*m+2*k*n*m);
-			tmp_not = std::make_shared<Not>(tmp_box);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_not);
-			tmp_atom2 = std::make_shared<Atom>(i+3+n*m+2*k*n*m);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_atom2);
+			
+			set_boxes = SetBoxes(0, k, n, m, i+1);
+			
+			tmp_and = std::make_shared<And>(tmp_and, set_boxes);
 			
 			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			tmp_atom1 = std::make_shared<Atom>(i+1+2*(k-1)*n*m);
-			tmp_not = std::make_shared<Not>(tmp_atom1);
-			tmp_atom1 = std::make_shared<Atom>(i+2+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+2+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_not, tmp_eql);
-			tmp_atom1 = std::make_shared<Atom>(i+3+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+3+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			tmp_and = std::make_shared<And>(tmp_and, tmp_eql);
-			
-			tmp_or = std::make_shared<Or>(tmp_or, tmp_and);
-			
-			res = std::make_shared<And>(res, tmp_or);
 		}
-
-		for(i=0; i<n*m; i+=m) {
-			tmp_atom1 = std::make_shared<Atom>(i+1+n*m+2*(k-1)*n*m);
-			tmp_atom2 = std::make_shared<Atom>(i+1+n*m+2*k*n*m);
-			tmp_eql = std::make_shared<Eql>(tmp_atom1, tmp_atom2);
-			
-			res = std::make_shared<And>(res, tmp_eql);
-		}
+		
+		res = std::make_shared<And>(res, tmp_or);
 		
 		return res;
 	
@@ -784,7 +849,5 @@ Formula Sokoban::GeneratePlanFormula() const {
 	
 	return plan_formula;
 }
-
-
 
 
