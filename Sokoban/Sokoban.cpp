@@ -2,7 +2,6 @@
 #include "Formula.hpp"
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <set>
@@ -642,7 +641,6 @@ static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, s
 }
 
 
-
 Table *Sokoban::GetTable() const {
 	return table;
 }
@@ -850,8 +848,5 @@ Formula Sokoban::GeneratePlanFormula() const {
 		}
 	}
 	
-	
 	return plan_formula;
 }
-
-
