@@ -3,4 +3,4 @@
 <h2>Opis programa</h2>
 
 
-<h2>Upustvo za pokretanje</h2>
+<h2>Uputstvo za pokretanje</h2>
