@@ -25,48 +25,26 @@ S - označava polje na kojem je Sokoban, koje je ujedno i kućica za kutiju;
 razmak - označava prazno polje.
 
 <br>
-Primer:
+<h4>Primer</h4>
 
-<div>
-    <p style="float: left;">&nbsp; &nbsp; ##### 
-        <br>
-       ###   # 
-        <br> 
-       #osb  # 
-        <br>
-       ### bo#
-        <br>
-       #o##b #
-        <br>
-       # # o ##
-        <br>
-       #b Bbbo#
-        <br>
-       #   o  #
-        <br>
-       ########
-        <br>
-    </p>
-    <p><img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="200px" width="200px" border="1px"></p>
-</div>
 
 <div style="clear: left;">
 <p style="float: left;"><img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="250" width="250" border="1px"></p>
-    <p>&nbsp; &nbsp; ##### 
+    <p>&nbsp;&nbsp;##### 
         <br>
-       ### &nbsp; &nbsp; &nbsp; # 
+       ###&nbsp;&nbsp;&nbsp;# 
         <br> 
-       #osb &nbsp; &nbsp; # 
+       #osb&nbsp;&nbsp;# 
         <br>
-       ### bo#
+       ###&nbsp;bo#
         <br>
-       #o##b #
+       #o##b&nbsp;#
         <br>
-       # # o ##
+       #&nbsp;#&nbsp;o&nbsp;##
         <br>
-       #b Bbbo#
+       #b&nbsp;Bbbo#
         <br>
-       # &nbsp; &nbsp; &nbsp; o &nbsp; &nbsp; #
+       #&nbsp;&nbsp;&nbsp;o&nbsp;&nbsp;#
         <br>
        ########
         <br>
