@@ -24,7 +24,8 @@ S - označava polje na kojem je Sokoban, koje je ujedno i kućica za kutiju;
 <br>
 razmak - označava prazno polje.
 
-<h4>Na primer, ova niska odgovara datom stanju table: </h4>
+<br>
+Na primer, ova niska odgovara datom stanju table:
 
 <img src="http://www.matf.bg.ac.rs/p/files/126-photo.png" height="250" width="250"> <img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="250" width="250">
 
