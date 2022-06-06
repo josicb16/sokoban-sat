@@ -3,16 +3,16 @@
 <h2>Sokoban</h2>
 
 <img src = "http://www.matf.bg.ac.rs/p/files/126-sokoban.gif" width ="200" height ="200">
-Sokoban je igra u kojoj je cilj da se svaka kutija, koja je na tabli, smesti u neku od datih kućica za kutije (broj kućica na tabli je jednak broju kutija). Igrač - Sokoban gura kutije sve dok ne ispuni cilj igre ili dok ne dođe do stanja u kom zasigurno više ne može da smesti sve kutije u kućice - tada je igra neuspešno završena.
+Sokoban je igra u kojoj je cilj da se svaka kutija, koja je na tabli, smesti na neko od označenih polja (broj označenih polja na tabli je jednak broju kutija). Igrač - Sokoban gura kutije sve dok ne ispuni cilj igre ili dok ne dođe do stanja u kom zasigurno više ne može da smesti sve kutije na sva označena polja - tada je igra neuspešno završena.
 <br>
 Sokoban može da gurne kutiju za samo jedno mesto gore, dole, levo ili desno, pri čemu ne može da gurne kutiju na željeno polje, ako je na tom polju zid ili druga kutija.
 
 <h2>Opis programa</h2>
 
 
-Program za datu tablu igre i za dati broj koraka n, ispisuje niz od najviše n pokreta koje Sokoban treba da napravi, da bi igra bila uspešno završena; ako igra ne može biti uspešno završena u tih n koraka, u tom slučaju program ispisuje odgovarajuću poruku o neuspehu. 
+Program za datu tablu igre i za dati broj koraka n, ispisuje niz od najviše n pokreta koje Sokoban treba da napravi, da bi igra bila uspešno završena; ako igra ne može da se uspešno završi u n koraka, tada program ispisuje odgovarajuću poruku o neuspehu. 
 
-Igrica Sokoban se u ovom zadatku posmatra kao problem planiranja, koji se onda svodi na SAT problem. Dakle, program generiše iskaznu formulu koja opisuje igru Sokoban, a zatim ispituje zadovoljivost te formule.
+Igra Sokoban se u ovom slučaju posmatra kao problem planiranja, koji se onda svodi na SAT problem. Dakle, traženje niza poteza za uspešan završetak igre svodi se na ispitivanje zadovoljivosti odgovarajuće iskazne formule, koju generise ovaj program.
 
 
 <br>
