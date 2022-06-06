@@ -29,7 +29,7 @@ Primer:
 
 <div>
     <p style="float: left;"><img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="200px" width="200px" border="1px"></p>
-    <p>  ##### 
+    <p style="float: right;">  ##### 
         <br>
        ###   # 
         <br> 
