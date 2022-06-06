@@ -9,7 +9,11 @@ Sokoban može da gurne kutiju za samo jedno mesto gore, dole, levo ili desno, pr
 
 <h2>Opis programa</h2>
 
-Program za datu tablu igre i za dati broj koraka - n, ispisuje niz od najviše n pokreta koje Sokoban treba da napravi, da bi igra bila uspešno završena; ako igra ne može biti uspešno završena u tih n koraka, u tom slučaju program ispisuje odgovarajuću poruku o neuspehu.
+
+Program za datu tablu igre i za dati broj koraka n, ispisuje niz od najviše n pokreta koje Sokoban treba da napravi, da bi igra bila uspešno završena; ako igra ne može biti uspešno završena u tih n koraka, u tom slučaju program ispisuje odgovarajuću poruku o neuspehu. 
+
+Igrica Sokoban se u ovom zadatku posmatra kao problem planiranja, koji se onda svodi na SAT problem. Dakle, program generiše iskaznu formulu koja opisuje igru Sokoban, a zatim ispituje zadovoljivost te formule.
+
 
 <br>
 Od korisnika se najpre traži da unese početni izgled table u vidu niske, koja sadrži sledeće karaktere: <br>
@@ -29,6 +33,10 @@ razmak - označava prazno polje.
 <br>
 <br>
 A nakon toga korisnik unosi ceo broj n koji predstavlja broj koraka. 
+
+<br>
+<br>
+<br>
 
 
 
