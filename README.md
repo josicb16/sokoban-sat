@@ -9,29 +9,44 @@ Sokoban može da gurne kutiju za samo jedno polje gore, dole, levo ili desno, pr
 
 <h2>Opis programa</h2>
 
-Od korisnika se najpre traži da unese početni izgled table u vidu niske, koja sadrži sledeće karaktere:
+Od korisnika se najpre traži da unese početni izgled table u vidu niske, koja sadrži sledeće karaktere: <br>
 &#35; - označava zid;
+<br>
 o - označava kućicu za kutiju;
+<br>
 b - označava polje na kojem se nalazi kutija;
+<br>
 B - označava polje na kojem se nalazi kutija, a koje je ujedno i kućica za kutiju;
+<br>
 s - označava polje na kojem je Sokoban;
+<br>
 S - označava polje na kojem je Sokoban, koje je ujedno i kućica za kutiju;
+<br>
 razmak - označava prazno polje.
 
+<br>
 Primer:
 
 <div>
     <p style="float: left;"><img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="200px" width="200px" border="1px"></p>
-    <p>
-           ##### 
-         ###   # 
-         #osb  # 
-         ### bo# 
-         #o##b # 
-         # # o ##
-         #b Bbbo#
-         #   o  #
-         ########
+    <p>  ##### 
+        <br>
+       ###   # 
+        <br> 
+       #osb  # 
+        <br>
+       ### bo#
+        <br>
+       #o##b #
+        <br>
+       # # o ##
+        <br>
+       #b Bbbo#
+        <br>
+       #   o  #
+        <br>
+       ########
+        <br>
     </p>
 </div>
 
