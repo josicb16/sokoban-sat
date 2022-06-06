@@ -12,7 +12,7 @@ Sokoban može da gurne kutiju za samo jedno mesto gore, dole, levo ili desno, pr
 
 Program za datu tablu igre i za dati broj koraka n, ispisuje niz od najviše n pokreta koje Sokoban treba da napravi, da bi igra bila uspešno završena; ako igra ne može da se uspešno završi u n koraka, tada program ispisuje odgovarajuću poruku o neuspehu. 
 
-Igra Sokoban se u ovom slučaju posmatra kao problem planiranja, koji se onda svodi na SAT problem. Dakle, traženje niza poteza za uspešan završetak igre svodi se na ispitivanje zadovoljivosti odgovarajuće iskazne formule, koju generise ovaj program.
+Igra Sokoban se u ovom slučaju posmatra kao problem planiranja, koji se onda svodi na SAT problem. Dakle, traženje niza poteza za uspešan završetak igre svodi se na ispitivanje zadovoljivosti iskazne formule kojom je predstavljen dati problem.
 
 
 <br>
