@@ -30,21 +30,21 @@ razmak - označava prazno polje.
 
 <div style="clear: left;">
 <p style="float: left;"><img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="250" width="250" border="1px"></p>
-    <p>&nbsp;&nbsp;##### 
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;##### 
         <br>
-       ###&nbsp;&nbsp;&nbsp;# 
+       ###&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
         <br> 
-       #osb&nbsp;&nbsp;# 
+       #osb&nbsp;&nbsp;&nbsp;&nbsp;# 
         <br>
-       ###&nbsp;bo#
+       ###&nbsp;&nbsp;bo#
         <br>
-       #o##b&nbsp;#
+       #o##b&nbsp;&nbsp;#
         <br>
-       #&nbsp;#&nbsp;o&nbsp;##
+       #&nbsp;#&nbsp;o&nbsp;&nbsp;&nbsp;&nbsp;##
         <br>
-       #b&nbsp;Bbbo#
+       #b&nbsp;&nbsp;Bbbo#
         <br>
-       #&nbsp;&nbsp;&nbsp;o&nbsp;&nbsp;#
+       #&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o&nbsp;&nbsp;&nbsp;&nbsp;#
         <br>
        ########
         <br>
