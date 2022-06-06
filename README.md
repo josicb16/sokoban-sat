@@ -11,7 +11,7 @@ Sokoban može da gurne kutiju za samo jedno mesto gore, dole, levo ili desno, pr
 
 Program za datu tablu igre i za dati broj koraka - n, ispisuje niz od najviše n pokreta koje Sokoban treba da napravi, da bi igra bila uspešno završena; ako igra ne može biti uspešno završena u tih n koraka, u tom slučaju program ispisuje odgovarajuću poruku o neuspehu.
 
-
+<br>
 Od korisnika se najpre traži da unese početni izgled table u vidu niske, koja sadrži sledeće karaktere: <br>
 &#35; - označava zid;
 <br>
@@ -27,8 +27,7 @@ S - označava polje na kojem je Sokoban, koje je ujedno i kućica za kutiju;
 <br>
 razmak - označava prazno polje.
 
-<br>
-Nakon toga korisnik unosi ceo broj n koji predstavlja maksimalni broj 
+A nakon toga korisnik unosi ceo broj n koji predstavlja broj koraka. 
 
 
 
