@@ -50,6 +50,30 @@ Primer:
     <p><img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="200px" width="200px" border="1px"></p>
 </div>
 
+<div style="clear: left;">
+<p style="float: left;"><img src="http://www.matf.bg.ac.rs/p/files/1654460188-126-sokoban.png" height="250" width="250" border="1px"></p>
+    <p>&nbsp; &nbsp; ##### 
+        <br>
+       ### &nbsp; &nbsp; &nbsp; # 
+        <br> 
+       #osb &nbsp; &nbsp; # 
+        <br>
+       ### bo#
+        <br>
+       #o##b #
+        <br>
+       # # o ##
+        <br>
+       #b Bbbo#
+        <br>
+       # &nbsp; &nbsp; &nbsp; o &nbsp; &nbsp; #
+        <br>
+       ########
+        <br>
+    </p>
+
+</div>
+
 
 
 <h2>Uputstvo za pokretanje</h2>
