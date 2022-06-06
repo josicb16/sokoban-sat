@@ -27,6 +27,7 @@ S - označava polje na kojem je Sokoban, koje je ujedno i kućica za kutiju;
 <br>
 razmak - označava prazno polje.
 <br>
+<br>
 A nakon toga korisnik unosi ceo broj n koji predstavlja broj koraka. 
 
 
