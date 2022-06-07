@@ -27,6 +27,10 @@ int main() {
 	
 	std::string tmp;
 	read >> tmp;
+	if(tmp=="UNSAT") {
+		std::cout << "Igra se ne moze uspesno zavrsiti u " << plan_length << " koraka." << std::endl; 
+		return 0;
+	}
 	
 	int i;
 	
