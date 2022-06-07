@@ -7,6 +7,8 @@ Sokoban je igra u kojoj je cilj da se svaka kutija, koja je na tabli, smesti na 
 <br>
 Sokoban može da gurne kutiju za samo jedno mesto gore, dole, levo ili desno, pri čemu ne može da gurne kutiju na željeno polje, ako je na tom polju zid ili druga kutija.
 
+
+
 <h2>Opis programa</h2>
 
 
@@ -34,9 +36,6 @@ razmak - označava prazno polje.
 <br>
 Nakon toga korisnik unosi još i ceo broj n koji predstavlja broj koraka. 
 
-<br>
-<br>
-<br>
 
 
 <h2>Pokretanje programa</h2>
