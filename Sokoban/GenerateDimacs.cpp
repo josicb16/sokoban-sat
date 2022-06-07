@@ -28,12 +28,23 @@ int main() {
 	Sokoban s(plan_length, table);	
 	
 	
+	std::ofstream info;
+	info.open("info.txt");
+	info << s.GetTable()->GetN() << " " << s.GetTable()->GetM() << " " << plan_length;
+	info.close();
+	
+	
+	
 	std::ofstream dimacs;
 	dimacs.open("dimacs.txt");
 
 	dimacs << s.GeneratePlanFormula()->Dimacs();
 	
 	dimacs.close();
+	
 
 	return 0;
 }
+
+
+
