@@ -6,16 +6,16 @@
 #include <vector>
 #include <set>
 
-std::vector<bool> State::GetPlayerCoordinates() const { return player_coordinates; }
-std::vector<bool> State::GetBoxesCoordinates() const { return boxes_coordinates; }
+const std::vector<bool> & InitialState::GetPlayerCoordinates() const { return player_coordinates; }
+const std::vector<bool> & InitialState::GetBoxesCoordinates() const { return boxes_coordinates; }
 
-std::vector<bool> Table::GetWalls() const { return walls; }
-std::vector<bool> Table::GetBoxHome() const { return box_home;}
+const std::vector<bool> & Table::GetWalls() const { return walls; }
+const std::vector<bool> & Table::GetBoxHome() const { return box_home;}
 int Table::GetN() const { return n; }
 int Table::GetM() const { return m; }
 
 
-static Formula MovePrecondition(int type, int k, int n, int m, std::vector<bool> &S, std::vector<bool> &B, std::vector<bool> &W) {
+static Formula MovePrecondition(int type, int k, int n, int m, const std::vector<bool> &W) {
 	int i;
 	
 	Formula res;
@@ -379,7 +379,7 @@ static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
 }
 
 
-static Formula MoveEffect(int type, int k, int n, int m, std::vector<bool> &S, std::vector<bool> &B) {
+static Formula MoveEffect(int type, int k, int n, int m) {
 	
 	int i;
 	
@@ -645,8 +645,8 @@ Table *Sokoban::GetTable() const {
 	return table;
 }
 		
-State *Sokoban::GetState() const {
-	return current_state;
+InitialState *Sokoban::GetInitialState() const {
+	return initial_state;
 }
 
 
@@ -692,20 +692,20 @@ Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 		}
 	}
 	table = new Table(n, m, walls, box_home);
-	current_state = new State(player_coordinates, boxes_coordinates);
+	initial_state = new InitialState(player_coordinates, boxes_coordinates);
 }
 
 Sokoban::~Sokoban() {
 	delete table;
-	delete current_state;
+	delete initial_state;
 }
 
 void Sokoban::PrintTable() const {
-	std::vector<bool> walls = table->GetWalls();
-	std::vector<bool> box_home = table->GetBoxHome();
+	const std::vector<bool> & walls = table->GetWalls();
+	const std::vector<bool> & box_home = table->GetBoxHome();
 	
-	std::vector<bool> player_coordinates = current_state->GetPlayerCoordinates();
-	std::vector<bool> boxes_coordinates = current_state->GetBoxesCoordinates();
+	const std::vector<bool> & player_coordinates = initial_state->GetPlayerCoordinates();
+	const std::vector<bool> & boxes_coordinates = initial_state->GetBoxesCoordinates();
 	
 	int n = table->GetN();
 	int m = table->GetM();
@@ -756,10 +756,10 @@ Formula Sokoban::GeneratePlanFormula() const {
 	Formula tmp_operator;
 
 	
-	std::vector<bool> S = current_state->GetPlayerCoordinates(); // [1, n*m]
-	std::vector<bool> B = current_state->GetBoxesCoordinates();  // [1+n*m, 2*n*m]
-	std::vector<bool> W = table->GetWalls();
-	std::vector<bool> BH = table->GetBoxHome();
+	const std::vector<bool> & S = initial_state->GetPlayerCoordinates();
+	const std::vector<bool> & B = initial_state->GetBoxesCoordinates();
+	const std::vector<bool> & W = table->GetWalls();
+	const std::vector<bool> & BH = table->GetBoxHome();
 	
 	int n = table->GetN();
 	int m = table->GetM();
@@ -802,22 +802,22 @@ Formula Sokoban::GeneratePlanFormula() const {
 	}
 	
 	for(i=1; i<=plan_length; i++) {
-		tmp_operator = MovePrecondition(0, i, n, m, S, B, W); 
-		tmp = MoveEffect(0, i, n, m, S, B);
+		tmp_operator = MovePrecondition(0, i, n, m, W); 
+		tmp = MoveEffect(0, i, n, m);
 		tmp_or = std::make_shared<And>(tmp_operator, tmp);
 		
-		tmp_operator = MovePrecondition(1, i, n, m, S, B, W); 
-		tmp = MoveEffect(1, i, n, m, S, B);
+		tmp_operator = MovePrecondition(1, i, n, m, W); 
+		tmp = MoveEffect(1, i, n, m);
 		tmp_operator = std::make_shared<And>(tmp_operator, tmp);
 		tmp_or = std::make_shared<Or>(tmp_or, tmp_operator);
 		
-		tmp_operator = MovePrecondition(2, i, n, m, S, B, W); 
-		tmp = MoveEffect(2, i, n, m, S, B);
+		tmp_operator = MovePrecondition(2, i, n, m, W); 
+		tmp = MoveEffect(2, i, n, m);
 		tmp_operator = std::make_shared<And>(tmp_operator, tmp);
 		tmp_or = std::make_shared<Or>(tmp_or, tmp_operator);
 		
-		tmp_operator = MovePrecondition(3, i, n, m, S, B, W); 
-		tmp = MoveEffect(3, i, n, m, S, B);
+		tmp_operator = MovePrecondition(3, i, n, m, W); 
+		tmp = MoveEffect(3, i, n, m);
 		tmp_operator = std::make_shared<And>(tmp_operator, tmp);
 		tmp_or = std::make_shared<Or>(tmp_or, tmp_operator);
 		
