@@ -253,25 +253,34 @@ int Eql::ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const {
 }
 
 
-std::string BaseFormula::Dimacs() const {
+std::string BaseFormula::Dimacs(int &atom, int &number_of_clauses) const {
 	Formula f = this->ToNNF();
 	
+	/*
 	std::set<int> atoms;
 	f->GetAtoms(atoms);
 	int atom = *atoms.rbegin() + 1;
+	*/
 	
 	std::vector<std::vector<int>> cnf;
 	int s = f->ToTseitinCNF(cnf, atom);
 	cnf.push_back({s});
 	
+	atom = ++s;
+	
+	/*
 	if(cnf.empty())
 		return "p cnf 0 0";
+	*/
 	
-	int number_of_clauses = cnf.size();
+	int n = cnf.size();
+	
+	number_of_clauses += n;
+	
 	
 	std::set<unsigned> variables;
 	int i;
-	for(i=0; i<number_of_clauses; i++) {
+	for(i=0; i<n; i++) {
 		auto it = cnf[i].cbegin();
 		auto it_end = cnf[i].cend();
 		while(it != it_end) {
@@ -280,11 +289,12 @@ std::string BaseFormula::Dimacs() const {
 		}
 	}
 	
-	int number_of_variables = variables.size();
+	// int number_of_variables = variables.size();
 	
-	std::string rez = "p cnf " + std::to_string(number_of_variables) + " " + std::to_string(number_of_clauses) + "\n";
+	// std::string rez = "p cnf " + std::to_string(number_of_variables) + " " + std::to_string(number_of_clauses) + "\n";
+	std::string rez = "";
 	
-	for(i=0; i<number_of_clauses; i++) {
+	for(i=0; i<n; i++) {
 		auto it = cnf[i].cbegin();
 		auto it_end = cnf[i].cend();
 		while(it != it_end) {

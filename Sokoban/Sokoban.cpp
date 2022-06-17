@@ -2,9 +2,11 @@
 #include "Formula.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <set>
+#include <algorithm>
 
 const std::vector<bool> & InitialState::GetPlayerCoordinates() const { return player_coordinates; }
 const std::vector<bool> & InitialState::GetBoxesCoordinates() const { return boxes_coordinates; }
@@ -378,7 +380,6 @@ static Formula SetBoxes(int type, int k, int n, int m, int b=-1) {
 	
 }
 
-
 static Formula MoveEffect(int type, int k, int n, int m) {
 	
 	int i;
@@ -742,7 +743,7 @@ void Sokoban::PrintTable() const {
 }
 
 
-Formula Sokoban::GeneratePlanFormula() const {
+void Sokoban::GeneratePlanFormula(std::ofstream &dimacs) const {
 	
 	int i;
 	
@@ -801,10 +802,18 @@ Formula Sokoban::GeneratePlanFormula() const {
 		}
 	}
 	
+	int atom = 2*n*m*(plan_length+1)+1;
+	
+	int number_of_clauses = 0;
+	
+ 	std::string dimacs_str = plan_formula->Dimacs(atom, number_of_clauses);
+	
+	
 	for(i=1; i<=plan_length; i++) {
 		tmp_operator = MovePrecondition(0, i, n, m, W); 
 		tmp = MoveEffect(0, i, n, m);
 		tmp_or = std::make_shared<And>(tmp_operator, tmp);
+		
 		
 		tmp_operator = MovePrecondition(1, i, n, m, W); 
 		tmp = MoveEffect(1, i, n, m);
@@ -819,20 +828,18 @@ Formula Sokoban::GeneratePlanFormula() const {
 		tmp_operator = MovePrecondition(3, i, n, m, W); 
 		tmp = MoveEffect(3, i, n, m);
 		tmp_operator = std::make_shared<And>(tmp_operator, tmp);
-		tmp_or = std::make_shared<Or>(tmp_or, tmp_operator);
+		plan_formula = std::make_shared<Or>(tmp_or, tmp_operator);
 		
-		plan_formula = std::make_shared<And>(plan_formula, tmp_or);
+		dimacs_str = dimacs_str + plan_formula->Dimacs(atom, number_of_clauses);
 		
 	}
 	
 	if(BH[0]) {
-		tmp_box = std::make_shared<Atom>(1+n*m+2*plan_length*n*m); 
-		plan_formula = std::make_shared<And>(plan_formula, tmp_box);
+		plan_formula = std::make_shared<Atom>(1+n*m+2*plan_length*n*m); 
 	}
 	else {
 		tmp_box = std::make_shared<Atom>(1+n*m+2*plan_length*n*m);
-		tmp_not = std::make_shared<Not>(tmp_box);
-		plan_formula = std::make_shared<And>(plan_formula, tmp_not);
+		plan_formula = std::make_shared<Not>(tmp_box);
 	}
 	
 	
@@ -848,5 +855,13 @@ Formula Sokoban::GeneratePlanFormula() const {
 		}
 	}
 	
-	return plan_formula;
+	dimacs_str = dimacs_str + plan_formula->Dimacs(atom, number_of_clauses);
+	
+	int number_of_variables = --atom;
+	
+	dimacs << "p cnf " + std::to_string(number_of_variables) + " " + std::to_string(number_of_clauses) + "\n";
+	dimacs << dimacs_str;
+	
+	
 }
+

@@ -38,7 +38,7 @@ int main() {
 	std::ofstream dimacs;
 	dimacs.open("dimacs.txt");
 
-	dimacs << s.GeneratePlanFormula()->Dimacs();
+	s.GeneratePlanFormula(dimacs);
 	
 	dimacs.close();
 	

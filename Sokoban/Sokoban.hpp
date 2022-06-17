@@ -15,9 +15,6 @@ class InitialState {
 		const std::vector<bool> & GetPlayerCoordinates() const;
 		const std::vector<bool> & GetBoxesCoordinates() const;
 		
-		// std::vector<bool> GetPlayerCoordinates() const; 
-		// std::vector<bool> GetBoxesCoordinates() const; 
-		
 	private:
 		std::vector<bool> player_coordinates;
 		std::vector<bool> boxes_coordinates;
@@ -46,7 +43,7 @@ class Sokoban {
 	public:
 		Sokoban(int _plan_length, std::vector<std::string> table);
 		~Sokoban();
-		Formula GeneratePlanFormula() const;
+		void GeneratePlanFormula(std::ofstream &dimacs) const;
 		Table *GetTable() const;
 		InitialState *GetInitialState() const;
 		void PrintTable() const;
@@ -56,7 +53,5 @@ class Sokoban {
 		Table *table;
 		InitialState *initial_state;
 };
-
-
 
 #endif

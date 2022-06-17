@@ -16,7 +16,7 @@ class BaseFormula {
 		virtual std::string GetType() const = 0;
 		virtual Formula ToNNF() const= 0;
 		virtual int ToTseitinCNF(std::vector<std::vector<int>>& cnf, int& atom) const = 0;
-		std::string Dimacs() const;
+		std::string Dimacs(int &atom, int &number_of_clauses) const;
 		virtual Formula GetFormulaData() const {	}
 		virtual Formula GetFormulaDataL() const {	}
 		virtual Formula GetFormulaDataR() const {	}
