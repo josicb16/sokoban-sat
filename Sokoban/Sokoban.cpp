@@ -8,11 +8,11 @@
 #include <set>
 #include <algorithm>
 
-const std::vector<bool> & InitialState::GetPlayerCoordinates() const { return player_coordinates; }
-const std::vector<bool> & InitialState::GetBoxesCoordinates() const { return boxes_coordinates; }
 
 const std::vector<bool> & Table::GetWalls() const { return walls; }
 const std::vector<bool> & Table::GetBoxHome() const { return box_home;}
+const std::vector<bool> & Table::GetPlayerCoordinates() const { return player_coordinates; }
+const std::vector<bool> & Table::GetBoxesCoordinates() const { return boxes_coordinates; }
 int Table::GetN() const { return n; }
 int Table::GetM() const { return m; }
 
@@ -645,10 +645,6 @@ static Formula MoveEffect(int type, int k, int n, int m) {
 Table *Sokoban::GetTable() const {
 	return table;
 }
-		
-InitialState *Sokoban::GetInitialState() const {
-	return initial_state;
-}
 
 
 Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
@@ -692,21 +688,18 @@ Sokoban::Sokoban(int _plan_length, std::vector<std::string> table_str) {
 			}
 		}
 	}
-	table = new Table(n, m, walls, box_home);
-	initial_state = new InitialState(player_coordinates, boxes_coordinates);
+	table = new Table(n, m, walls, box_home, player_coordinates, boxes_coordinates);
 }
 
 Sokoban::~Sokoban() {
 	delete table;
-	delete initial_state;
 }
 
 void Sokoban::PrintTable() const {
 	const std::vector<bool> & walls = table->GetWalls();
 	const std::vector<bool> & box_home = table->GetBoxHome();
-	
-	const std::vector<bool> & player_coordinates = initial_state->GetPlayerCoordinates();
-	const std::vector<bool> & boxes_coordinates = initial_state->GetBoxesCoordinates();
+	const std::vector<bool> & player_coordinates = table->GetPlayerCoordinates();
+	const std::vector<bool> & boxes_coordinates = table->GetBoxesCoordinates();
 	
 	int n = table->GetN();
 	int m = table->GetM();
@@ -757,8 +750,8 @@ void Sokoban::GeneratePlanFormula(std::ofstream &dimacs) const {
 	Formula tmp_operator;
 
 	
-	const std::vector<bool> & S = initial_state->GetPlayerCoordinates();
-	const std::vector<bool> & B = initial_state->GetBoxesCoordinates();
+	const std::vector<bool> & S = table->GetPlayerCoordinates();
+	const std::vector<bool> & B = table->GetBoxesCoordinates();
 	const std::vector<bool> & W = table->GetWalls();
 	const std::vector<bool> & BH = table->GetBoxHome();
 	
